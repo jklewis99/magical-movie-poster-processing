@@ -44,6 +44,32 @@ unzip -qj /path/to/archive.zip "/Multi_Label_dataset/Images/*" -d /path/to/magic
 * `j` strips path info that is inside of the zipfile: (`Multi_Label_dataset/Images/*.jpg` becomes `/*.jpg`)
 * `d` destination directory for the the image files
 
+## Branches
+After you have cloned the repository and have set up the data, checkout to your branch (`lewis`, `kim`, `baehr`, `phan`):
+```
+git checkout [BRANCH-NAME]
+```
+Show all the branches and verify that you are on the right branch:
+```
+git branch -a
+```
+Before you begin working on any work, make sure your branch is in sync with `master`:
+```
+git checkout master
+git pull
+git checkout [BRANCH-NAME]
+git merge master
+```
+When you want to merge your branch with master:
+```
+git add . # stage all files for commit
+git commit -m "Statement describing commit"
+git push # push to remote branch HEAD
+git checkout master
+git merge [BRANCH-NAME]
+git commit -m "Merged branch [BRANCH-NAME] with master"
+git push
+```
 ### Acknowledgements
 * Wei-Ta Chu and Hung-Jui Guo for the [raw data](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/index.html)
 * [raman](https://www.kaggle.com/raman77768) on Kaggle
