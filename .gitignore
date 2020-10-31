@@ -1,6 +1,9 @@
 # Folder is too large
 data/Images/*
 
+# for local testing
+garbage.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
