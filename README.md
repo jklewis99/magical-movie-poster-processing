@@ -6,7 +6,7 @@ Ensure you have Python 3.5 or greater installed. You can use pip or anaconda. Yo
 Navigate to the folder in which you want to store this repository. Then clone the repository and change directory to the repository:
 ```
 git clone https://github.com/jklewis99/magical-movie-poster-processing.git
-cd furiosa
+cd magical-movie-poster-processing
 ```
 #### 2. Activate a virtual environment (optional, but recommended):
 
