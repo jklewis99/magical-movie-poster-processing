@@ -53,21 +53,30 @@ Show all the branches and verify that you are on the right branch:
 ```
 git branch -a
 ```
-Before you begin working on any work, make sure your branch is in sync with `master`:
+Before you begin working on any work, make sure your branch is in sync with `main`:
 ```
-git checkout master
+git checkout main
 git pull
 git checkout [BRANCH-NAME]
-git merge master
+git merge main
 ```
-When you want to merge your branch with master:
+When you want to merge your branch with main:
 ```
 git add . # stage all files for commit
 git commit -m "Statement describing commit"
-git push # push to remote branch HEAD
-git checkout master
+```
+* If this is your first push to a remote upstream for the branch:
+    ```
+    git push --set-upstream origin [BRANCH-NAME]
+    ```
+* Otherwise:
+    ```
+    git push
+    ```
+```
+git checkout main
 git merge [BRANCH-NAME]
-git commit -m "Merged branch [BRANCH-NAME] with master"
+git commit -m "Merged branch [BRANCH-NAME] with main"
 git push
 ```
 ### Acknowledgements
