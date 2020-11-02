@@ -1,0 +1,4 @@
+There are 3 modes when running the code
+1. 'python main.py train' will start loading data, creating neural network model, and training the model
+2. 'python main.py predict enter_path_of_image' will predict the genres based on the image 
+3. 'python main.py find_threshold' will output and save the graph accuracy vs threshold under the name 'evaluation.png'
