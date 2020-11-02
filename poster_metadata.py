@@ -9,7 +9,7 @@ def make_json_readable(s):
 
     Parameters
     ==========
-    s
+    `s`:
         complete string from text file
 
     Returns
@@ -19,7 +19,7 @@ def make_json_readable(s):
     '''
 
     # replace new line-separated json-like objects with commma-separated objects
-    s= s.replace("}\n{", "},{")
+    s = s.replace("}\n{", "},{")
 
     # remove the rest of the new line characters
     s = s.replace("\n", "")

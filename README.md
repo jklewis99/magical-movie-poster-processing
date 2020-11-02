@@ -27,6 +27,7 @@ source [ENV_NAME]/bin/activate
 conda update conda
 conda create -n [ENV_NAME]
 conda activate [ENV_NAME]
+conda install pip # install pip to allow easy requirements.txt install
 ```
 #### 3. Install the requirements:
 ```
