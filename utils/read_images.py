@@ -4,7 +4,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 
-def read_images(images_list, with_tensorflow=False, path=f"data/Images", \
+def read_images(images_list, dimensions=(299, 299), with_tensorflow=False, path=f"data/Images", \
     has_extension=False, extension_type="jpg"):
     '''
     takes a list of file names without extension, reads the images, 
@@ -40,13 +40,13 @@ def read_images(images_list, with_tensorflow=False, path=f"data/Images", \
         images_path_list = [os.path.join(path, image) for image in images_list]
     
     if with_tensorflow:
-        images_read = read_images_tensorflow(images_path_list, (350, 350, 3))
+        images_read = read_images_tensorflow(images_path_list, dimensions)
     else:
-        images_read = read_images_opencv(images_path_list, (240, 360))
+        images_read = read_images_opencv(images_path_list, dimensions)
 
     return images_read
 
-def read_images_opencv(images_list, dimensions):
+def read_images_opencv(images_list, dimensions, num_channels=3):
     '''
     takes a list of paths to images and reads them with opencv
 
@@ -62,21 +62,18 @@ def read_images_opencv(images_list, dimensions):
     ==========
     numpy array of the read images
     '''
-    
-    dims = set()
 
-    np_images = []
-    for img_path in images_list:
+    np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
+
+    for i, img_path in enumerate(images_list):
         img = cv2.imread(img_path)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = cv2.resize(img, dimensions, interpolation=cv2.INTER_AREA)
-        dims.add(img.shape)
-        np_images.append(img)
-    print(dims)
+        np_images[i] = img
 
     return np.array(np_images)
 
-def read_images_tensorflow(images_list, dimensions):
+def read_images_tensorflow(images_list, dimensions, num_channels=3):
     '''
     takes a list of paths to images and reads them with tensorflow's image module
 
@@ -93,10 +90,10 @@ def read_images_tensorflow(images_list, dimensions):
     numpy array of the read images
     '''
 
-    np_images = []
-    for img_path in images_list:
-        img = image.load_img(img_path, target_size=dimensions)
+    np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
+    for i, img_path in enumerate(images_list):
+        img = image.load_img(img_path, target_size=(dimensions[0], dimensions[1], num_channels))
         img = image.img_to_array(img)
-        np_images.append(img)
+        np_images[i] = img
 
     return np.stack(np_images)

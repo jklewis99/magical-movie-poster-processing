@@ -3,4 +3,6 @@ numpy
 matplotlib
 scikit-learn
 opencv-python
+torch
 tensorflow
+keras
