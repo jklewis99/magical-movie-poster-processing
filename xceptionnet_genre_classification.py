@@ -1,4 +1,5 @@
 import warnings
+import os
 
 import cv2
 from sklearn.utils import validation
@@ -9,11 +10,11 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from keras import Model, Sequential
-from keras.layers import Dense, Dropout, Flatten, Input, LeakyReLU
-from keras.layers import BatchNormalization, Activation, Conv2D 
-from keras.layers import GlobalAveragePooling2D, Lambda
-from keras.optimizers import Adam, RMSprop
+from keras import Model
+from keras.layers import Dense, Dropout, Input
+from keras.layers import Activation
+from keras.layers import Lambda
+from keras.optimizers import Adam
 
 from keras.applications.xception import Xception
 from keras.applications.xception import preprocess_input
@@ -27,121 +28,32 @@ from sklearn.model_selection import train_test_split
 
 from utils.read_images import read_images
 
-
-# CONSTANTS
-label_encoder = LabelEncoder()
-one_hot_encoder = OneHotEncoder(sparse=True)
-input_shape = (299, 299)
-num_channels = 3
-
 def load_data(img_shape=(299, 299)):
+    '''
+    read data from the csv file containing the id of movies and the labels
+
+    Keyword Arguments
+    ==========
+    img_shape:
+        (299, 299) for input size to XceptionNet
+
+    Return
+    ==========
+    tuple of numpy arrays: (x_train, x_test, y_train, y_test)
+    '''
+
     ids_and_genres = pd.read_csv("data/posters-and-genres.csv")
     ids_and_genres.drop(['Genre'], axis=1, inplace=True) # genre is irrelevant with boolean encoded genres
-    
-    
 
-    ids = ids_and_genres['Id'].values
-    genres = ids_and_genres.loc[:, ids_and_genres.columns != 'Id'].values
+    ids = ids_and_genres['Id'].values # isolate the ids
+    genres = ids_and_genres.loc[:, ids_and_genres.columns != 'Id'].values # isolate the genre labels
 
-    # info = dict()
-    # for i, id in enumerate(ids):
-    #     info[id] = genres[i]
+    imgs = read_images(ids) # read in all the images into a numpy array
 
-    imgs = read_images(ids)
-    
+    # call the sklearn train_test_split method
     x_train, x_test, y_train, y_test = train_test_split(imgs, genres, test_size=0.2)
     
     return x_train, x_test, y_train, y_test
-
-def train(model):
-    x_train, y_train, x_test, y_test = load_data()
-
-    checkpoint1 = ModelCheckpoint('xception_checkpoint-1.h5', 
-                              save_freq='epoch', 
-                              verbose=1, 
-                              save_weights_only=True)
-    checkpoint2 = ModelCheckpoint('xception_checkpoint-2.h5', 
-                                save_freq='epoch', 
-                                verbose=1, 
-                                save_weights_only=True)
-    checkpoint3 = ModelCheckpoint('xception_checkpoint-3-best.h5', 
-                                save_freq='epoch', 
-                                verbose=1, 
-                                monitor='loss', 
-                                save_best_only=True, 
-                                save_weights_only=True)
-
-    result = model.fit(x_train, y_train, epochs=1000, validation_data=(x_test, y_test), \
-        callbacks=[checkpoint1, checkpoint2, checkpoint3])
-    
-    # Plot history
-    plot_history(result)
-
-def get_image_gen(info_arg,
-                  batch_size=48,
-                  shuffle=True, 
-                  image_aug=True, 
-                  eq_dist=False, 
-                  n_ref_imgs=16, 
-                  crop_prob=0.5, 
-                  crop_p=0.5):
-    if image_aug:
-        datagen = ImageDataGenerator(
-            rotation_range=4.,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            shear_range=0.2,
-            zoom_range=0.5,
-            channel_shift_range=25,
-            horizontal_flip=True,
-            fill_mode='nearest')
-        
-        if crop_prob > 0:
-            datagen_crop = ImageDataGenerator(
-                rotation_range=4.,
-                shear_range=0.2,
-                zoom_range=0.1,
-                channel_shift_range=20,
-                horizontal_flip=True,
-                fill_mode='nearest')
-        
-    count = len(info_arg)
-    while True:
-        if eq_dist:
-            def sample(df):
-                return df.sample(min(n_ref_imgs, len(df)))
-            info = info_arg.groupby('landmark_id', group_keys=False).apply(sample)
-        else:
-            info = info_arg
-        print('Generate', len(info), 'for the next round.')
-        
-        #shuffle data
-        if shuffle and count >= len(info):
-            info = info.sample(frac=1)
-            count = 0
-            
-        # load images
-        for ind in range(0,len(info), batch_size):
-            count += batch_size
-
-            y = info['landmark_id'].values[ind:(ind+batch_size)]
-            
-            imgs = read_images(info.iloc[ind:(ind+batch_size)])
-            if image_aug:
-                cflow = datagen.flow(imgs, 
-                                    y, 
-                                    batch_size=imgs.shape[0], 
-                                    shuffle=False)
-                imgs, y = next(cflow)             
-
-            imgs = preprocess_input(imgs)
-    
-            y_l = label_encoder.transform(y[y>=0.])        
-            y_oh = np.zeros((len(y), n_cat))
-            y_oh[y >= 0., :] = one_hot_encoder.transform(y_l.reshape(-1,1)).todense()
-                    
-            yield imgs, y_oh
- 
 
 def generalized_mean_pool_2d(X, gm_exp=tf.Variable(3., dtype=tf.float32)):
     pool = (tf.reduce_mean(tf.abs(X**(gm_exp)), 
@@ -165,11 +77,60 @@ def batch_GAP(y_t, y_p):
     return GAP    
 
 def binary_crossentropy_n_cat(y_t, y_p):
-    return keras.metrics.binary_crossentropy(y_t, y_p) * n_cat
+    return keras.metrics.binary_crossentropy(y_t, y_p) * 25 # n_cat
 
-def main():
-    # K.clear_sessions()
-    n_cat = 81313
+def plot_history(result):
+    # Create and save a plot consists of val_loss and val_acc
+    plt.figure()
+    plt.plot(result.history['val_loss'], label='val_loss')
+    plt.xlabel("Epcohs")
+    plt.ylabel("Loss")
+    plt.savefig(os.path.join(os.getcwd(), 'Data', 'loss.png'))
+
+    plt.figure()
+    plt.plot(result.history['val_accuracy'], label='val_accuracy')
+    plt.xlabel("Epcohs")
+    plt.ylabel("Accuracy")
+    
+    plt.savefig(os.path.join(os.getcwd(), 'Data', 'accuracy.png'))
+
+def train(model):
+    print("Loading data..........", end="")
+    x_train, x_test, y_train, y_test = load_data()
+    print("DONE")
+    print("SHAPES:")
+    print("xtrain:", x_train.shape)
+    print("ytrain:", y_train.shape)
+    
+    checkpoint1 = ModelCheckpoint('xception_checkpoint-1.h5',
+                              save_freq='epoch',
+                              verbose=1,
+                              save_weights_only=True)
+    checkpoint2 = ModelCheckpoint('xception_checkpoint-2.h5',
+                                save_freq='epoch',
+                                verbose=1, 
+                                save_weights_only=True)
+    checkpoint3 = ModelCheckpoint('xception_checkpoint-3-best.h5',
+                                save_freq='epoch',
+                                verbose=1, 
+                                monitor='loss', 
+                                save_best_only=True, 
+                                save_weights_only=True)
+    print("Checkpoints set.")
+    
+    print("Fit model on training data")
+    result = model.fit(x_train, y_train, epochs=100, validation_data=(x_test, y_test), \
+        callbacks=[checkpoint1, checkpoint2, checkpoint3])
+    
+    # Plot history
+    plot_history(result)
+
+# This function finds the threshold for predicting
+def load_model(weights_path):
+    
+    n_cat = 25
+    input_shape = (299, 299)
+    num_channels = 3
 
     model = Xception(input_shape=list(input_shape) + [num_channels], weights="imagenet", include_top=False)
     # model.summary()
@@ -178,7 +139,7 @@ def main():
     for layer in model.layers[:85]:
         layer.trainable = False
     
-    # model.summary()
+#     print(model.summary())
     gm_exp = tf.Variable(3., dtype=tf.float32)
     x_feat = Input(model.output_shape[1:])
 
@@ -190,15 +151,109 @@ def main():
     X = Dense(n_cat, activation='softmax')(X)
 
     top_model = Model(inputs=x_feat, outputs=X)
-    # top_model.summary()
+#     print(top_model.summary())
     x_image = Input(list(input_shape) + [3])
 
     x_f = model(x_image)
     x_f = top_model(x_f)
-
     model = Model(inputs=x_image, outputs=x_f)
-    # model.summary()
+#     print(model.summary())
+    model.load_weights(weights_path)
+    return model
 
+def find_threshold():
+    model = load_model("xception_checkpoint-3-best.h5")  # Load model
+    print("Loading data.......", end="")
+    x_train, x_test, y_train, y_test = load_data()  # Load data
+    print("done")
+    data = np.concatenate((x_train, x_test), axis=0)
+    label = np.concatenate((y_train, y_test), axis=0)
+    thresholds = [0.9, 0.8, 0.7, 0.6, 0.5]
+    plot_data = []
+    predictions = []
+
+    for threshold in thresholds:
+        evaluation = evaluate(model, threshold, data, label, 25)
+        plot_data.append(evaluation[0])
+        predictions.append(evaluation[1])
+
+    fig = plt.figure()
+    plt.plot(thresholds, plot_data, color='red')
+    plt.title("Model Accuracy per Threshold")
+    plt.xlabel("Threshold")
+    plt.ylabel("Model Prediction Performance")
+    plt.savefig(os.path.join('xceptionnet-evaluation.png'))
+    plt.show()
+    
+    fig = plt.figure()
+    plt.bar(np.arange(len(thresholds)), [x - 0.9 for x in plot_data], bottom=0.9, align='center', color='orange')
+    plt.title("Model Accuracy per Threshold")
+    plt.xticks(np.arange(len(thresholds)), thresholds)
+    plt.xlabel("Threshold")
+    plt.ylabel("Model Prediction Performance")
+    plt.savefig(os.path.join('xceptionnet-evaluation-bar.png'))
+    plt.show()
+    
+    return {
+        "thresholds": thresholds,
+        "plot_data": plot_data,
+        "data": data,
+        "labels": label,
+        "predictions": predictions
+    }
+
+# This function evaluates the model performance given the threshold and other data
+def evaluate(model, threshold, data, label, num_genres):
+    print("Predicting.......", end="")
+    prediction = model.predict(data)
+    print("done")
+    acc = 0
+
+    for result, sub_label in zip(prediction, label):
+        for i in range(num_genres):
+            if result[i] >= threshold and sub_label[i] == 1:
+                acc += 1
+
+            if result[i] < threshold and sub_label[i] == 0:
+                acc += 1
+
+    return (acc / (len(label) * num_genres), prediction)
+
+def main():
+    # K.clear_sessions()
+    n_cat = 25
+    label_encoder = LabelEncoder()
+    one_hot_encoder = OneHotEncoder(sparse=True)
+    input_shape = (299, 299)
+    num_channels = 3
+
+    model = Xception(input_shape=list(input_shape) + [num_channels], weights="imagenet", include_top=False)
+    # model.summary()
+    for layer in model.layers:
+        layer.trainable = True
+    for layer in model.layers[:85]:
+        layer.trainable = False
+    
+#     print(model.summary())
+    gm_exp = tf.Variable(3., dtype=tf.float32)
+    x_feat = Input(model.output_shape[1:])
+
+    lambda_layer = Lambda(generalized_mean_pool_2d)
+    lambda_layer.trainable_weights.extend([gm_exp])
+    X = lambda_layer(x_feat)
+    X = Dropout(0.05)(X)
+    X = Activation('relu')(X)
+    X = Dense(n_cat, activation='softmax')(X)
+
+    top_model = Model(inputs=x_feat, outputs=X)
+#     print(top_model.summary())
+    x_image = Input(list(input_shape) + [3])
+
+    x_f = model(x_image)
+    x_f = top_model(x_f)
+    model = Model(inputs=x_image, outputs=x_f)
+#     print(model.summary())
+    model.load_weights("xception_checkpoint-3-best.h5")
     optimizer = Adam(lr=0.0001)
     loss = tf.keras.losses.BinaryCrossentropy()
     model.compile(loss=loss, optimizer=optimizer, metrics=[binary_crossentropy_n_cat, 'accuracy', batch_GAP])

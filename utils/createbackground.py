@@ -20,6 +20,7 @@ def main():
     idx = yearly_group.groupby(['year_released'], sort=True)['score'].transform(max) == yearly_group['score']
     print(movie_metadata.head())
     highest_rated_per_year = yearly_group[idx].sort_values(['year_released'])
+    print(highest_rated_per_year)
     make_image_stack(highest_rated_per_year)
 
 def make_image_stack(dataframe):
@@ -33,9 +34,9 @@ def make_image_stack(dataframe):
     for i in range(num_rows):
         row = []
         for id in img_ids[num_cols*i:num_cols*(1+i)]:
-            print(id)
+            # print(id)
             img = cv2.imread(os.path.join(img_dir, id + ".jpg"))
-            print(img.shape)
+            # print(img.shape)
             # plt.imshow(img)
             # plt.show()
             img = cv2.resize(img, (300, 450), interpolation=cv2.INTER_AREA)
