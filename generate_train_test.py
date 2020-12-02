@@ -14,7 +14,6 @@ def main():
     cols = data.columns.tolist()
     cols = cols[1:2] + cols[5:6] + cols[2:5] + cols[6:] + cols[0:1]
     data = data[cols] # reorder columns
-    # print(data.sum())
     train, test = train_test_split(data, test_size=0.2) # generate train and test data
     train.to_csv("data/train_data.csv", index=False)
     test.to_csv("data/test_data.csv", index=False)
