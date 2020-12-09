@@ -53,8 +53,8 @@ def read_images(images_list, dimensions=(299, 299), with_tensorflow=False, path=
         raise NotImplementedError("This feature has not been implemented. Change `with_tensorflow` keyword to False.")
     else:
         if needed_memory_bytes > 0.9 * available_memory_bytes:
-            print("(MemoryError: You do not have enough space for the entire dataset... It has been downsampled to 1000 images)")
-            subset_size = 1000
+            print(f"(MemoryError: You do not have enough space for the entire dataset... It has been downsampled to {int(0.2*len(images_list))} images)")
+            subset_size = int(0.2*len(images_list))
         images_read = read_images_PIL(images_path_list[:subset_size], dimensions)
 
     return images_read, subset_size
