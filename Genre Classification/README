@@ -1,4 +1,22 @@
-There are 3 modes when running the code
+There are 4 modes when running the code (REQUIRED)
 1. 'python main.py train' will start loading data, creating neural network model, and training the model
-2. 'python main.py predict enter_path_of_image' will predict the genres based on the image 
+2. 'python main.py predict' will predict the genres based on the image 
 3. 'python main.py find_threshold' will output and save the graph accuracy vs threshold under the name 'evaluation.png'
+4. 'python main.py class_activation_map' will create a class activation map on the image
+
+There are 3 types of model when running the code (REQUIRED)
+1. 'python main.py --model=1' will select NasNetLarge model
+2. 'python main.py --model=2' will select InceptionResNetV2 model
+3. 'python main.py --model=3' will select Xception model
+
+When selecting the 'train', there are 2 training modes (default is 1)
+1. 'python main.py --train_mode=1' will train with the new model
+2. 'python main.py --train_mode=2' will train with the existing model
+
+When selecting the 'predict' or 'class_activation_map', '--path' is representing the path of the image
+
+Examples of Command:
+'python main.py train --model=1 --train_mode=1' will create and train a new NasNetLarge model
+'python main.py predict --model=1 --path=test.jpg' will use NasNetLarge model (assuming the model has been trained) to predict the image called 'test.jpg'
+'python main.py class_activation_map --model=1 --path=test.jpg' will use NasNetLarge model (assuming the model has been trained) to create a class activation map on the image called 'test.jpg'
+'python main.py find_threshold --model=1' will use NasNetLarge model (assuming the model has been trained) to find the threshold (confidence level)
