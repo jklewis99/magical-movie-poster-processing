@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
 import os
-import tensorflow as tf
-from tensorflow.keras.preprocessing import image
+import psutil
+from PIL import Image
+
 
 def read_images(images_list, dimensions=(299, 299), with_tensorflow=False, path=f"data/Images", \
-    has_extension=False, extension_type="jpg"):
+    has_extension=False, extension_type="jpg", num_channels=3):
     '''
     takes a list of file names without extension, reads the images, 
     and returns a numpy array of the images
@@ -34,17 +35,29 @@ def read_images(images_list, dimensions=(299, 299), with_tensorflow=False, path=
     ==========
     numpy array of the read images
     '''
+    available_memory_bytes = psutil.virtual_memory().available
+    element_size = 64 / 8 # flaot uses 64 bits, and we convert to bytes
+    # estimate space required for images
+    needed_memory_bytes = len(images_list) * dimensions[0] * dimensions[1] * 3 * element_size
+    subset_size = len(images_list)
+
+    # get paths of relative/absolute path of images and save in list
     if not has_extension:
         images_path_list = [os.path.join(path, f"{image}.{extension_type}") for image in images_list]
     else:
         images_path_list = [os.path.join(path, image) for image in images_list]
     
     if with_tensorflow:
-        images_read = read_images_tensorflow(images_path_list, dimensions)
+        from tensorflow.keras.preprocessing import image
+        # images_read = read_images_tensorflow(images_path_list, np_images[:subset_size], dimensions)
+        raise NotImplementedError("This feature has not been implemented. Change `with_tensorflow` keyword to False.")
     else:
-        images_read = read_images_opencv(images_path_list, dimensions)
+        if needed_memory_bytes > 0.9 * available_memory_bytes:
+            print("(MemoryError: You do not have enough space for the entire dataset... It has been downsampled to 1000 images)")
+            subset_size = 1000
+        images_read = read_images_PIL(images_path_list[:subset_size], dimensions)
 
-    return images_read
+    return images_read, subset_size
 
 def read_images_opencv(images_list, dimensions, num_channels=3):
     '''
@@ -62,7 +75,6 @@ def read_images_opencv(images_list, dimensions, num_channels=3):
     ==========
     numpy array of the read images
     '''
-
     np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
 
     for i, img_path in enumerate(images_list):
@@ -89,11 +101,42 @@ def read_images_tensorflow(images_list, dimensions, num_channels=3):
     ==========
     numpy array of the read images
     '''
-
+    # TODO: FIX ALLOCATION ERRORS
     np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
+
     for i, img_path in enumerate(images_list):
         img = image.load_img(img_path, target_size=(dimensions[0], dimensions[1], num_channels))
         img = image.img_to_array(img)
         np_images[i] = img
 
     return np.stack(np_images)
+
+def read_images_PIL(images_list, dimensions, img_shape=(299, 299), num_channels=3):
+    '''
+    takes a list of paths to images and reads them with Pillow's Image module
+
+    Parameters
+    ==========
+    `images_list`:
+        list of strings
+
+    `dimensions`:
+        tuple specifying width and height of image
+
+    Keyword Args
+    ==========
+    `img_shape`:
+        (height, width) to resize
+    
+    `num_channels`:
+        number of RBG channels
+
+    Returns
+    ==========
+    numpy array of the read images
+    '''
+    np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
+    # Load training and testing data
+    for i, img_path in enumerate(images_list):
+        np_images[i] = np.asarray(Image.open(img_path).resize((img_shape), Image.ANTIALIAS))
+    return np_images
