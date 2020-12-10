@@ -1,6 +1,9 @@
 # Folder is too large
 data/Images/*
 
+# File is too large
+NasNetLarge.h5
+
 # for local testing
 garbage.py
 
