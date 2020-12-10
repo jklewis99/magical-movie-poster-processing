@@ -20,7 +20,7 @@ from tensorflow.keras.applications.inception_resnet_v2 import InceptionResNetV2
 
 from utils.read_images import read_images
 from utils.data_read import load_data, load_train_test
-from utils.misc import labels_to_text, show_labels_and_predictions, get_genres
+from utils.misc import labels_to_text, show_poster_and_genres, get_genres
 
 parser = argparse.ArgumentParser(description="Classify movie genres based on the movie poster", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument(
@@ -257,6 +257,16 @@ def evaluate(model, threshold, data, actual_labels, num):
     prediction = model.predict(data)
     acc = 0
 
+    # TODO: EVALUATE THIS CODE BLOCK
+    #######################################
+    binary_preds = np.zeros_like(prediction)
+    binary_preds[np.where(prediction > threshold)] = 1
+    values = np.equal(binary_preds, actual_labels) # get the element-wise equality
+    perfect_count = np.count_nonzero(np.all(values, axis=1)) # get which rows are equal for each genre
+    perfect_accuracy = perfect_count / len(binary_preds)
+    print(perfect_accuracy)
+    #######################################
+    
     for result, actual_label in zip(prediction, actual_labels):
         for i in range(num):
             if result[i] >= threshold and actual_label[i] == 1:
@@ -292,7 +302,7 @@ def predict(img_path, genres, model_path):
     for i in range(len(genres)):
         if prediction[0][i] >= threshold:
             result.append(genres[i])
-
+    show_poster_and_genres(img_path, result, save_img=True, model=model_path.split("\\")[-1][:-3])
     print('Genre(s): ' + str(result))
 
 def class_activation_map(img_path, genres, model_type, model_path):

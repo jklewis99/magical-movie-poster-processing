@@ -128,6 +128,7 @@ def train(train_data="data/train_data.csv", test_data="data/test_data.csv", epoc
     print("Checkpoints set.")
     
     print("Fit model on training data")
+    # model.load_weights('weights/xception_checkpoint-best.h5')
     model.compile(optimizer='adam', loss=loss, metrics=[
                                                     lambda actual, preds: binary_crossentropy_multiclass(actual, preds, num_labels),
                                                     LabelsPerfect(num_labels),
