@@ -192,10 +192,10 @@ For `find_threshold`, this is NOT recommended. *This will take approximately mor
 Inside of this folder is all of the data from each step in the process. After [raw metadata](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip) is processed with the [`poster_metadata.py`](/poster_metadata.py) file, the file [`movies-metadata.csv`](/data/movies-metadata.csv) is created within this folder.
 
 > ### /figures
->Inside this figure you will find figures that compare models and highlight features in the dataset. For ecample, you can see in [this image](/figures/background_img.png) that not all posters in the dataset came from movies.
+>Inside this figure you will find figures that compare models and highlight features in the dataset. For ecample, you can see in [this image](/figures/background-img.png) that not all posters in the dataset came from movies.
 
 > ### /notebooks
->Inside this folder is the [notebook](/notebooks/pandas_intro) we created to help those new to the [Pandas](https://pandas.pydata.org/) data analysis API so that they can use this data for a *brief* introduction to the powerfool tool. You will also find the [`data_clean.ipynb`](/notebooks/data_clean.ipynb) notebook, which was used to clean data for regression models.
+>Inside this folder is the [notebook](/notebooks/pandas_intro.ipynb) we created to help those new to the [Pandas](https://pandas.pydata.org/) data analysis API so that they can use this data for a *brief* introduction to the powerfool tool. You will also find the [`data_clean.ipynb`](/notebooks/data_clean.ipynb) notebook, which was used to clean data for regression models.
 
 > ### /utils
 >This folder contains all utility modules and helper functions used across the repo.
