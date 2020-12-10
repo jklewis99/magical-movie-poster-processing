@@ -45,22 +45,6 @@ def split_data(data="data/posters-and-genres.csv", img_shape=(299, 299)):
     
     return x_train, x_test, y_train, y_test
 
-# def load_data(data):
-#     ids_and_genres = pd.read_csv(data)
-#     ids_and_genres.drop(['Genre'], axis=1, inplace=True) # genre is irrelevant with boolean encoded genres
-
-#     ids = ids_and_genres['Id'].values # isolate the ids
-#     genres = ids_and_genres.loc[:, ids_and_genres.columns != 'Id'].values # isolate the genre labels
-
-#     print("\nLoading images........")
-#     # read in all the images into an array, return number of indices used (used to combat memory error)
-#     imgs, subset_size = read_images(ids)
-#     print("DONE!\n")
-
-#     # if there was a memory error, update the labels as were updated within read_images functions
-#     genres = genres[:subset_size]
-#     return imgs, genres
-
 def load_test_data(data='data/test_data.csv'):
     test_ids = pd.read_csv(data)['imdbID'].values
     ids_and_genres = pd.read_csv("data/posters-and-genres.csv").drop(columns=['Genre'])

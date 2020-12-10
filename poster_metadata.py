@@ -1,3 +1,7 @@
+'''
+python file used to create the get the metadata into a csv from each of 
+the .txt files in `data/Movie_Poster_Metadata` folder
+'''
 import pandas as pd
 import os
 import json

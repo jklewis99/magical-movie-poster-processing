@@ -50,6 +50,21 @@ def show_labels_and_predictions(img, preds, actual,
     plt.show()
     return img
 
+def get_genres():
+    '''
+    return the full list of strings with the names of the genres
+    
+    Return
+    ==========
+    genres
+    '''
+     # All the genres in the posters-and-genres.csv metadata file
+    genres = ['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime',
+              'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror',
+              'Music', 'Musical', 'Mystery', 'N/A', 'News', 'Reality-TV', 'Romance',
+              'Sci-Fi', 'Short', ' Sport', 'Thriller', 'War', 'Western']
+
+    return genres
 class LabelsPerfect(Metric):
     #TODO: fix the inaccurate logic of this class
     def __init__(self, num_classes, name='labels_perfect', **kwargs):
