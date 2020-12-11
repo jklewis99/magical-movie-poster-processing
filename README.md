@@ -47,12 +47,12 @@ The image files are too large to store in this repo, so they must be downloaded 
     * `d` destination directory for the the image files
 
 #### 4. Download the pre-trained models
-Models are too large to be stored on github, so each of them can be found on this [Google Drive folder](https://drive.google.com/drive/folders/10ism9rrmjRZlMwPBYz4FjyMGew32VVh4?usp=sharing). Save these files into the `/weights` folder.
+Models are too large to be stored on github, so each of them can be found on this [Google Drive folder](https://drive.google.com/drive/folders/10ism9rrmjRZlMwPBYz4FjyMGew32VVh4?usp=sharing). Save these files into the `/models` folder.
 
 Alternatively, these files can be downloaded with the `gdown` executable (which is installed during the `pip install -r requirements.txt` command). The models can be downloaded with the following commands:
 
 ```
-cd weights
+cd models
 gdown https://drive.google.com/uc?id=1mflm_OPy-V1wVjG_zPqdcgjG0VfYDfV6
 ```
 **Note**: This is *required* for most CNN functions in `main.py` if you do not train your own models.
@@ -173,6 +173,10 @@ For `find_threshold`, this is NOT recommended. *This will take approximately mor
 │   ├── xception_preds
 │   ├── xceptionnet-evaluation-bar.png
 │   └── xceptionnet-evaluation.png
+├── models
+│   ├── InceptionResNetV2.h5
+│   ├── NasNetLarge.h5
+│   ├── XceptionNet.h5
 ├── notebooks
 │   ├── data_clean.ipynb
 │   ├── data_overview.ipynb
@@ -195,19 +199,22 @@ For `find_threshold`, this is NOT recommended. *This will take approximately mor
 └── xception_transfer.py
 ```
 > ### /data
-Inside of this folder is all of the data from each step in the process. After [raw metadata](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip) is processed with the [`poster_metadata.py`](/poster_metadata.py) file, the file [`movies-metadata.csv`](/data/movies-metadata.csv) is created within this folder.
+>Inside of this folder is all of the data from each step in the process. After [raw metadata](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip) is processed with the [`poster_metadata.py`](/poster_metadata.py) file, the file [`movies-metadata.csv`](/data/movies-metadata.csv) is created within this folder.
 
 > ### /figures
->Inside this figure you will find figures that compare models and highlight features in the dataset. For ecample, you can see in [this image](/figures/background_img.png) that not all posters in the dataset came from movies.
+>Inside this folder you will find figures that compare models and highlight features in the dataset. For example, you can see in [this image](/figures/background_img.png) that not all posters in the dataset came from movies.
+
+> ### /models
+>Inside this folder you will find the `.h5` files that encode the pre-trained models for `InceptionResNetV2`, `NasNetLarge`, and `XceptionNet`. The files which is used in the `main.py` file is specified by the `model` parameter.
 
 > ### /notebooks
->Inside this folder is the [notebook](/notebooks/pandas_intro) we created to help those new to the [Pandas](https://pandas.pydata.org/) data analysis API so that they can use this data for a *brief* introduction to the powerfool tool. You will also find the [`data_clean.ipynb`](/notebooks/data_clean.ipynb) notebook, which was used to clean data for regression models.
+>Inside this folder is the [notebook](/notebooks/pandas_intro) we created to help those new to the [Pandas](https://pandas.pydata.org/) data analysis API so that they can use this data for a *brief* introduction to the powerful tool. You will also find the [`data_clean.ipynb`](/notebooks/data_clean.ipynb) notebook, which was used to clean data for regression models.
 
 > ### /utils
 >This folder contains all utility modules and helper functions used across the repo.
 
 > ### /weights
->Folder containing the weights/models `.h5` files for the neural networks.
+>This folder contains the weights for the XceptionNet model with different architecture. These weights are used by [`xception_transfer.py`](/xception_transfer.py).
 
 All methods at the root of the repo were the main functions for creating this repo.
 

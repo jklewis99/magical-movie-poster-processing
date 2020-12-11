@@ -415,11 +415,11 @@ def main(args):
     model_type = args.model
 
     if model_type in ['1', 'NasNet']:
-        model_path = os.path.join(os.getcwd(), 'NasNetLarge.h5')
+        model_path = os.path.join(os.getcwd(), 'models', 'NasNetLarge.h5')
     elif model_type in ['2', 'InceptionResNet']:
-        model_path = os.path.join(os.getcwd(), 'InceptionResNetV2.h5')
+        model_path = os.path.join(os.getcwd(), 'models', 'InceptionResNetV2.h5')
     else:
-        model_path = os.path.join(os.getcwd(), 'XceptionNet.h5')
+        model_path = os.path.join(os.getcwd(), 'models', 'XceptionNet.h5')
 
     if mode == 'train':
         train(args.train_mode, model_type, model_path)
