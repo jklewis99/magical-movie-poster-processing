@@ -49,3 +49,4 @@ urllib3==1.25.11
 Werkzeug==1.0.1
 wrapt==1.12.1
 zipp==3.4.0
+gdown==3.12.2

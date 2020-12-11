@@ -49,7 +49,13 @@ The image files are too large to store in this repo, so they must be downloaded 
 #### 4. Download the pre-trained models
 Models are too large to be stored on github, so each of them can be found on this [Google Drive folder](https://drive.google.com/drive/folders/10ism9rrmjRZlMwPBYz4FjyMGew32VVh4?usp=sharing). Save these files into the `/weights` folder.
 
-**Note**: This is REQUIRED for most CNN functions in `main.py` if you do not wish to train your own models.
+Alternatively, these files can be downloaded with the `gdown` executable (which is installed during the `pip install -r requirements.txt` command). The models can be downloaded with the following commands:
+
+```
+cd weights
+gdown https://drive.google.com/uc?id=1mflm_OPy-V1wVjG_zPqdcgjG0VfYDfV6
+```
+**Note**: This is *required* for most CNN functions in `main.py` if you do not train your own models.
 
 #### 5. (Optional) Download external raw data 
 The raw data, from Wei-Ta Chu and Hung-Jui Guo's paper **Movie Genre Classification based on Poster Images with Deep Neural Networks**, can be downloaded [here](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip). For more information and to better understand the data, we recommend going to the [source](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/index.html).
