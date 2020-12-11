@@ -49,6 +49,10 @@ The image files are too large to store in this repo, so they must be downloaded 
 #### 4. Download the pre-trained models
 Models are too large to be stored on github, so each of them can be found on this [Google Drive folder](https://drive.google.com/drive/folders/10ism9rrmjRZlMwPBYz4FjyMGew32VVh4?usp=sharing). Save these files into the `/weights` folder.
 
+```
+cd weights
+gdown https://drive.google.com/uc?id=10ism9rrmjRZlMwPBYz4FjyMGew32VVh4
+```
 **Note**: This is REQUIRED for most CNN functions in `main.py` if you do not wish to train your own models.
 
 #### 5. (Optional) Download external raw data 
