@@ -18,9 +18,9 @@ def main():
     testingData = trainingData.dropna(axis=0)
 
     # Assign x and y training and testing values
-    xtrain = trainingData[['imdbVotes', 'Runtime', 'imdbRating', 'Metascore', 'Release_month', 'Oscar_noms', 'Oscar_wins', 'Golden_globe_noms', 'Golden_globe_wins', 'BAFTA_noms', 'BAFTA_wins', 'Other_noms', 'Other_wins', 'Release_month', 'rated_G', 'rated_NOT RATED', 'rated_PG', 'rated_PG-13', 'rated_R', 'rated_UNRATED', 'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'News', 'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western']].values.astype(np.float)
+    xtrain = trainingData.iloc[ :, 2:43].values.astype(np.float)
     ytrain = trainingData[['Box_office']].values.astype(np.float)
-    xtest = testingData[['imdbVotes', 'Runtime', 'imdbRating', 'Metascore', 'Release_month', 'Oscar_noms', 'Oscar_wins', 'Golden_globe_noms', 'Golden_globe_wins', 'BAFTA_noms', 'BAFTA_wins', 'Other_noms', 'Other_wins', 'Release_month', 'rated_G', 'rated_NOT RATED', 'rated_PG', 'rated_PG-13', 'rated_R', 'rated_UNRATED', 'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Musical', 'Mystery', 'News', 'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western']].values.astype(np.float)
+    xtest = testingData.iloc[ :, 2:43].values.astype(np.float)
     ytest = testingData[['Box_office']].values.astype(np.float)
 
     # Train the model with LinearRegression
