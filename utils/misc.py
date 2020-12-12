@@ -1,7 +1,9 @@
 import cv2
 import numpy as np
+import pandas as pd
 from tensorflow.keras.metrics import Metric
 import tensorflow as tf
+import os
 
 def labels_to_text(preds, actual_genres, genre_names, threshold=0.3):
     '''
@@ -109,6 +111,23 @@ def get_genres():
 
     return genres
 
+def average_genres():
+    '''
+    method to count the average number of genres for each film
+    '''
+    data = pd.read_csv("../data/posters-and-genres.csv").drop(columns=["Genre"])
+    data = data.drop_duplicates(subset="Id")
+    data = data.drop(columns=["Id"])
+    print(len(data.columns))
+    print(len(data))
+    print(data.shape)
+    # get count of genres for each film
+    data = np.sum(data, axis=1)
+    print(data.shape)
+    unique, counts = np.unique(data, return_counts=True)
+    print(np.asarray((unique, counts)))
+    print(np.mean(data))
+
 class LabelsPerfect(Metric):
     #TODO: fix the inaccurate logic of this class
     def __init__(self, num_classes, threshold=0.3, name='labels_perfect', **kwargs):
@@ -142,3 +161,7 @@ class LabelsPerfect(Metric):
 
     def result(self):
         return self.perfect_labels
+
+if __name__ == "__main__":
+    # print(os.getcwd())
+    average_genres()
