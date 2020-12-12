@@ -8,11 +8,9 @@ import skimage.io as io
 
 from scipy.stats import pearsonr
 
-##DATAPATH = os.path.expanduser('~/Documents/PythonLibrary/csc3520/Project/magical-movie-poster-processing/data/')
 # -------------------------- train_data.csv -------------------------------
 
 # Read csv
-##path = os.path.join(DATAPATH, "train_data.csv")
 features = pd.read_csv("data/train_data.csv", thousands=',')
 
 # Drop first row

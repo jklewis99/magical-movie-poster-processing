@@ -8,11 +8,9 @@ import skimage.io as io
 
 from scipy.stats import pearsonr
 
-DATAPATH = os.path.expanduser('~/Documents/PythonLibrary/csc3520/Project/magical-movie-poster-processing/data/')
 # -------------------------- movies-metadata.csv -------------------------------
 # Read csv
-path = os.path.join(DATAPATH, "movies-metadata.csv")
-features = pd.read_csv(path, thousands=',')
+features = pd.read_csv("data/movies-metadata.csv", thousands=',')
 
 # Drop first row
 features = features.dropna(axis=0)
@@ -51,8 +49,7 @@ plt.annotate(f"Pearson-R = {correlation2:.2f}", (np.min(imdbRating), 0.98*np.max
 # -------------------------- movies-metadata-cleaned.csv -----------------------
 
 # Read csv
-path = os.path.join(DATAPATH, "movies-metadata-cleaned.csv")
-features = pd.read_csv(path, thousands=',')
+features = pd.read_csv("data/movies-metadata-cleaned.csv", thousands=',')
 
 # Drop first row
 features = features.dropna(axis=0)
