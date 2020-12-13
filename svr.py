@@ -1,6 +1,7 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score
 from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +12,7 @@ def main():
 
     # Read csv
     trainingData = pd.read_csv("data/train_data.csv", thousands=',')
-    testingData = pd.read_csv("data/train_data.csv", thousands=',')
+    testingData = pd.read_csv("data/test_data.csv", thousands=',')
 
     # Drop the first row
     trainingData = trainingData.dropna(axis=0)
@@ -28,8 +29,17 @@ def main():
 ##                            'BAFTA_noms', 'BAFTA_wins', 'Other_noms', 'Other_wins', 'Release_month', 'rated_G', 'rated_NOT RATED', 'rated_PG', 'rated_PG-13', 'rated_R',
 ##                            'rated_UNRATED', 'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History',
 ##                            'Horror', 'Music', 'Musical', 'Mystery', 'News', 'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western']].values.astype(np.float)
-    x_test = trainingData.iloc[ :, 2:43].values.astype(np.float)
+    x_test = testingData.iloc[ :, 2:43].values.astype(np.float)
     y_test = testingData[['Box_office']].values.astype(np.float)
+
+    scalar_x = StandardScaler() # need to scale our data (I think)
+    scalar_y = StandardScaler() # need to scale our data (I think)
+
+    x_train = scalar_x.fit_transform(x_train)
+    y_train = scalar_y.fit_transform(y_train.reshape(-1, 1))
+    x_test = scalar_x.transform(x_test)
+    y_test = scalar_y.transform(y_test.reshape(-1, 1))
+
 
     results_r2 = []
 
