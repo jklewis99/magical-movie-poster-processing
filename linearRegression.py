@@ -11,11 +11,11 @@ def main():
 
     # Read csv
     trainingData = pd.read_csv("data/train_data.csv", thousands=',')
-    testingData = pd.read_csv("data/train_data.csv", thousands=',')
+    testingData = pd.read_csv("data/test_data.csv", thousands=',')
 
     # Drop the first row
     trainingData = trainingData.dropna(axis=0)
-    testingData = trainingData.dropna(axis=0)
+    testingData = testingData.dropna(axis=0)
 
     # Assign x and y training and testing values
     xtrain = trainingData.iloc[ :, 2:43].values.astype(np.float)
@@ -42,7 +42,6 @@ def main():
     plt.title('Actual Revenue vs Predicted Revenue', fontsize = 16)
     plt.ylabel('Actual Revenue', fontsize = 14)
     plt.xlabel('Predicted Revenue', fontsize = 14)
-    pdb.set_trace()
     plt.annotate(f"r2 Score = {r_squared:.2f}", (np.min(preds), 0.98*np.max(ytest)), fontsize=10) # plot the value on the graph
     plt.show()
 
