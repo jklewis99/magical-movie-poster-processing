@@ -209,6 +209,9 @@ def find_threshold(model_path, model_type):
     ==========
     `model_path`:
         absolute or relative path to the model's file
+
+    `model_type`:
+        string type of the model
     '''
     shape = get_model_shape(model_type)
     model = load_model(model_path)  # Load model
@@ -220,28 +223,68 @@ def find_threshold(model_path, model_type):
     plot_data = []
     perf_data = []
 
-    start = time.time()
     for threshold in thresholds:
         genres_accuracy, perfect_accuracy = evaluate(model, threshold, data, label, len(genres))
         plot_data.append(genres_accuracy)
         perf_data.append(perfect_accuracy)
         print(plot_data)
-    end = time.time()
 
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, plot_data)
-    graph.subtitle(model_name + '\n#Params: ' + model.count_params() + '\nEvaluation Completion Time: ' + str(int(end - start)) + ' seconds')
-    graph.xlabel('Threshold')
-    graph.ylabel('Accuracy')
+    graph.set_title(model_name + " Total Genre Accuracy Per Threshold")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
     plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
     #plt.show()
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, perf_data)
-    graph.subtitle(model_name + '\n#Params: ' + model.count_params() + '\nEvaluation Completion Time: ' + str(int(end - start)) + ' seconds')
-    graph.xlabel('Threshold')
-    graph.ylabel('Accuracy')
+    graph.set_title(model_name + " Perfect Multi-label Classification Accuracy")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
+    plt.savefig(os.path.join('figures', model_name + '_perfect_evaluation.png'))
+
+def test_data_evaluation(model_path, model_type):
+    '''
+    This function finds the threshold for predicting genres on the test data
+
+    Parameters
+    ==========
+    `model_path`:
+        absolute or relative path to the model's file
+
+    `model_type`:
+        string type of the model
+    '''
+    shape = get_model_shape(model_type)
+    model = load_model(model_path)  # Load model
+    model_name = str(model_path.split('\\')[-1]).split('.')[0] + "-TEST"
+    x_test, y_test, _, genres = load_data(img_shape=shape)  # Load data
+    thresholds = [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+    plot_data = []
+    perf_data = []
+
+    for threshold in thresholds:
+        genres_accuracy, perfect_accuracy = evaluate(model, threshold, x_test, y_test, len(genres))
+        plot_data.append(genres_accuracy)
+        perf_data.append(perfect_accuracy)
+        print(plot_data)
+
+    fig = plt.figure()
+    graph = fig.add_subplot(1, 1, 1)
+    graph.plot(thresholds, plot_data)
+    graph.set_title(model_name + " Total Genre Accuracy Per Threshold")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
+    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
+    #plt.show()
+    fig = plt.figure()
+    graph = fig.add_subplot(1, 1, 1)
+    graph.plot(thresholds, perf_data)
+    graph.set_title(model_name + " Perfect Multi-label Classification Accuracy")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
     plt.savefig(os.path.join('figures', model_name + '_perfect_evaluation.png'))
 
 def evaluate(model, threshold, data, actual_labels, num):
