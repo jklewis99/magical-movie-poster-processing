@@ -13,14 +13,20 @@ def main():
     testingData = pd.read_csv("data/train_data.csv", thousands=',')
 
     # Drop the first column
-    trainingData = trainingData.dropna(axis=0)
-    testingData = trainingData.dropna(axis=0)
+    # this function does not do what I think you think it does
+    # print(trainingData.columns)
+    # trainingData = trainingData.dropna(axis=0)
+    # print(trainingData.columns)
+    # testingData = trainingData.dropna(axis=0)
+    # however, because of the later conversition to float, strings are deleted
+    trainingData = trainingData.drop(columns=['imdbID', 'Title'])
+    testingData = testingData.drop(columns=['imdbID', 'Title'])
 
     # Assign x and y training and testing values
-    xtrain = trainingData.iloc[ :, 2:43].values.astype(np.float)
-    ytrain = trainingData[['Box_office']].values.astype(np.float)
-    xtest = testingData.iloc[ :, 2:43].values.astype(np.float)
-    ytest = testingData[['Box_office']].values.astype(np.float)
+    xtrain = trainingData.iloc[ :, :-1].values.astype(np.float)
+    ytrain = trainingData.iloc[:, -1].values.astype(np.float)
+    xtest = testingData.iloc[ :, :-1].values.astype(np.float)
+    ytest = testingData.iloc[:, -1].values.astype(np.float)
 
     # Ravel y_train
     ytrain = ytrain.ravel()
@@ -35,7 +41,7 @@ def main():
 
     for numTree in numTrees:
         # Train the model
-        regressor = RandomForestRegressor(n_estimators= numTree, random_state = 18, max_samples = 0.8)
+        regressor = RandomForestRegressor(n_estimators= numTree, random_state = 3520, max_samples = 0.8)
 
         # Fit the regressor to the training data
         regressor.fit(xtrain, ytrain)
