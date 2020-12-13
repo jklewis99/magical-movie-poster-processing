@@ -21,13 +21,7 @@ def main():
     # Assign x and y training and testing values
     x_train = trainingData.iloc[ :, 2:43].values.astype(np.float)
     y_train = trainingData[['Box_office']].values.astype(np.float)
-<<<<<<< HEAD
-##    x_test = testingData[['imdbVotes', 'Runtime', 'imdbRating', 'Metascore', 'Release_month', 'Oscar_noms', 'Oscar_wins', 'Golden_globe_noms', 'Golden_globe_wins',
-##                            'BAFTA_noms', 'BAFTA_wins', 'Other_noms', 'Other_wins', 'Release_month', 'rated_G', 'rated_NOT RATED', 'rated_PG', 'rated_PG-13', 'rated_R',
-##                            'rated_UNRATED', 'Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Family', 'Fantasy', 'History',
-##                            'Horror', 'Music', 'Musical', 'Mystery', 'News', 'Romance', 'Sci-Fi', 'Sport', 'Thriller', 'War', 'Western']].values.astype(np.float)
-=======
->>>>>>> 2f393f706bb161726dd60b77b25c2cd5c8619c59
+
     x_test = testingData.iloc[ :, 2:43].values.astype(np.float)
     y_test = testingData[['Box_office']].values.astype(np.float)
 
