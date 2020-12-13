@@ -111,7 +111,7 @@ def read_images_tensorflow(images_list, dimensions, num_channels=3):
 
     return np.stack(np_images)
 
-def read_images_PIL(images_list, dimensions, img_shape=(299, 299), num_channels=3):
+def read_images_PIL(images_list, dimensions, num_channels=3):
     '''
     takes a list of paths to images and reads them with Pillow's Image module
 
@@ -138,5 +138,5 @@ def read_images_PIL(images_list, dimensions, img_shape=(299, 299), num_channels=
     np_images = np.zeros((len(images_list), dimensions[0], dimensions[1], num_channels))
     # Load training and testing data
     for i, img_path in enumerate(images_list):
-        np_images[i] = np.asarray(Image.open(img_path).resize((img_shape), Image.ANTIALIAS))
+        np_images[i] = np.asarray(Image.open(img_path).resize((dimensions), Image.ANTIALIAS))
     return np_images

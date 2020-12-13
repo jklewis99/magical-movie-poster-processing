@@ -213,7 +213,7 @@ def find_threshold(model_path, model_type):
     shape = get_model_shape(model_type)
     model = load_model(model_path)  # Load model
     model_name = str(model_path.split('\\')[-1]).split('.')[0]
-    x_train, y_train, x_test, y_test, genres = load_train_test(shape)  # Load data
+    x_train, y_train, x_test, y_test, genres = load_train_test(img_shape=shape)  # Load data
     data = np.concatenate((x_train, x_test), axis=0)
     label = np.concatenate((y_train, y_test), axis=0)
     thresholds = [0.3, 0.2, 0.1]
