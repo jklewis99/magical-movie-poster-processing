@@ -47,7 +47,8 @@ def main():
         results_r2.append(r_squared)
 
         plt.figure()
-        plt.scatter(preds, y_test, s = 1, marker = "o", facecolor = "none", edgecolor = "blue")
+        rescaled_preds, rescaled_actual = inverse_transform(preds, y_test, scalar_y)
+        plt.scatter(rescaled_preds, rescaled_actual, s = 1, marker = "o", facecolor = "none", edgecolor = "blue")
 
         # Plot line from min point to max point
         ax = plt.gca()
@@ -62,11 +63,10 @@ def main():
         m = (y2 - y1) / (x2 - x1)
 
         regression_line = []
-        for x in preds:
+        for x in rescaled_preds:
             regression_line.append((m*x))
 
-        plt.plot(preds, regression_line, color = 'red', linewidth=1)
-
+        plt.plot(rescaled_preds, regression_line, color = 'red', linewidth=1)
 
         plt.title('Actual Revenue vs Predicted Revenue (' + kernel + ")", fontsize = 14)
         plt.ylabel('Actual Revenue', fontsize = 12)
@@ -80,6 +80,20 @@ def main():
 
     # Plot results
     plt.show()
+
+def inverse_transform(predictions, actual, scalar):
+    '''
+    transform the values to original scale
+    Return
+    ==========
+    tuple of rescaled `predictions`, rescaled `actual`
+    '''
+    if len(predictions.shape) > 1:
+        rescaled_predictions = scalar.inverse_transform(np.array([val[0] for val in predictions]))
+    else:
+        rescaled_predictions = scalar.inverse_transform(predictions)
+    rescaled_actual = scalar.inverse_transform(actual).flatten()
+    return rescaled_predictions, rescaled_actual
 
 
 if __name__ == "__main__":

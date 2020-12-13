@@ -57,7 +57,7 @@ gdown https://drive.google.com/uc?id=1mflm_OPy-V1wVjG_zPqdcgjG0VfYDfV6
 ```
 **Note**: This is *required* for most CNN functions in `main.py` if you do not train your own models.
 
-#### 5. (Optional) Download external raw data 
+#### 5. (Optional) Download external raw data
 The raw data, from Wei-Ta Chu and Hung-Jui Guo's paper **Movie Genre Classification based on Poster Images with Deep Neural Networks**, can be downloaded [here](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip). For more information and to better understand the data, we recommend going to the [source](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/index.html).
 
 **Note**: For the file, [`poster_metadata.py`](/poster_metadata.py), to run, this data must be downloaded into the [`data`](/data) folder. It should be double nested folder, `Movie_Poster_Metadata/groundtruth`, in which are `.txt` files whose name is by their year of the films data within the `.txt` file, ranging from 1970 to 2015, inclusive. For example: `2002.txt` is a valid name of the file.
@@ -102,7 +102,7 @@ git push
 There are 4 modes when running `main.py`. `mode` is a REQUIRED parameter:
 
 1. `train` will start loading data, creating neural network model, and training the model
-2. `predict` will predict the genres based on the image 
+2. `predict` will predict the genres based on the image
 3. `find_threshold` will output and save the graph accuracy vs threshold under the name 'evaluation.png'
 4. `class_activation_map` will create a class activation map on the image
 
@@ -137,6 +137,12 @@ Examples of Command:
     ```
     python main.py find_threshold --model=1
     ```
+### Box Office Prediction
+
+There are  modes when running `box_office.py`. `mode` is a REQUIRED parameter:
+
+
+
 ### What to expect
 If you are running these functions on a computer compatible with an NVIDIA GPU with enough memory, most functions will run relatively fast. In general, these functions will run on the CPU, but will be much slower:
 
