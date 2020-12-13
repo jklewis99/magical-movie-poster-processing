@@ -137,12 +137,6 @@ Examples of Command:
     ```
     python main.py find_threshold --model=1
     ```
-### Box Office Prediction
-
-There are  modes when running `box_office.py`. `mode` is a REQUIRED parameter:
-
-
-
 ### What to expect
 If you are running these functions on a computer compatible with an NVIDIA GPU with enough memory, most functions will run relatively fast. In general, these functions will run on the CPU, but will be much slower:
 
@@ -155,6 +149,10 @@ For `class_activation_map`, this will take approximately ~60 seconds.
 For `find_threshold`, this is NOT recommended. *This will take approximately more than 30+ minutes (for 1000 images).*
 
 **Note**: Data size is downsampled if there is not enough available RAM for storing the all images in the dataset.
+
+### Box Office Prediction
+
+There is 1 mode when running `box_office.py`. `mode` is a REQUIRED parameter:
 
 ## Navigating this Repo
 ```bash

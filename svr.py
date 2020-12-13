@@ -71,7 +71,7 @@ def main():
         plt.title('Actual Revenue vs Predicted Revenue (' + kernel + ")", fontsize = 14)
         plt.ylabel('Actual Revenue', fontsize = 12)
         plt.xlabel('Predicted Revenue', fontsize = 12)
-        plt.annotate(f"r2 Score = {r_squared:.5f}", (np.min(preds), 0.98*np.max(y_test)), fontsize=10) # plot the value on the graph
+        plt.annotate(f"r2 Score = {r_squared:.5f}", (np.min(rescaled_preds), 0.98*np.max(rescaled_actual)), fontsize=10) # plot the value on the graph
 
     kernels = np.array(kernels)
     results_r2 = np.array(results_r2)
