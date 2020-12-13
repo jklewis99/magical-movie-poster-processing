@@ -75,7 +75,9 @@ def get_NasNetLarge(num_output):
 
     Return
     ==========
-    NasNetLarge model with an updated last layer MLP
+    model, (331,331)
+
+    NasNetLarge model with an updated last layer MLP, required input shape
     '''
     pre_train_model = NASNetLarge(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -83,7 +85,7 @@ def get_NasNetLarge(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model
+    return model, (331, 331)
 
 def get_InceptionResnetV2(num_output):
     '''
@@ -96,7 +98,9 @@ def get_InceptionResnetV2(num_output):
 
     Return
     ==========
-    InceptionResNetV2 model with an updated last layer MLP
+    model, (299,299)
+
+    InceptionResNetV2 model with an updated last layer MLP, required input shape
     '''
     pre_train_model = InceptionResNetV2(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -104,7 +108,7 @@ def get_InceptionResnetV2(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model
+    return model, (299,299)
 
 def get_XceptionNet(num_output):
     '''
@@ -117,7 +121,9 @@ def get_XceptionNet(num_output):
 
     Return
     ==========
-    XceptionNet model with an updated last layer MLP
+    model, (299,299)
+
+    XceptionNet model with an updated last layer MLP, required input shape
     '''
     pre_train_model = Xception(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -125,7 +131,7 @@ def get_XceptionNet(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model
+    return model, (299,299)
 
 def plot_history(result):
     '''
@@ -167,17 +173,20 @@ def train(train_mode, model_type, model_path):
     `model_path`:
         absolute or relative path to the model's file
     '''
-    x_train, y_train, x_test, y_test, genres = load_train_test()  # Load data
+    genres = get_genres()
+
+
+    if model_type in ['1', 'NasNet']:
+        model, shape = get_NasNetLarge(len(genres))
+    elif model_type in ['2', 'InceptionResNet']:
+        model, shape = get_InceptionResnetV2(len(genres))
+    else:
+        model, shape = get_XceptionNet(len(genres))
 
     if train_mode == 2:
         model = load_model(model_path)
-    else:
-        if model_type in ['1', 'NasNet']:
-            model = get_NasNetLarge(len(genres))
-        elif model_type in ['2', 'InceptionResNet']:
-            model = get_InceptionResnetV2(len(genres))
-        else:
-            model = get_XceptionNet(len(genres))
+    
+    x_train, y_train, x_test, y_test, _ = load_train_test(img_shape=shape)  # Load data
 
     checkpoint = ModelCheckpoint(
         filepath=model_path,

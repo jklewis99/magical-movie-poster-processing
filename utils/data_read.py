@@ -21,14 +21,14 @@ def split_data(data="data/posters-and-genres.csv", img_shape=(299, 299)):
     ==========
     tuple of numpy arrays: (x_train, x_test, y_train, y_test)
     '''
-    imgs, genres = load_data(data)
+    imgs, genres = load_data(data, img_shape=img_shape)
 
     # call the sklearn train_test_split method
     x_train, x_test, y_train, y_test = train_test_split(imgs, genres, test_size=0.2, random_state=3520)
     
     return x_train, x_test, y_train, y_test
 
-def load_train_test(training_data='data/train_data.csv', testing_data='data/test_data.csv'):
+def load_train_test(training_data='data/train_data.csv', testing_data='data/test_data.csv', img_shape=(299,299)):
     '''
     top level method for getting the training and test data for the CNN models
 
@@ -44,11 +44,11 @@ def load_train_test(training_data='data/train_data.csv', testing_data='data/test
     ==========
     x_train, y_train, x_test, y_test
     '''
-    x_train, y_train, _, genres = load_data(training_data) 
-    x_test, y_test, _, _ = load_data(testing_data)
+    x_train, y_train, _, genres = load_data(training_data, img_shape=img_shape) 
+    x_test, y_test, _, _ = load_data(testing_data, img_shape=img_shape)
     return x_train, y_train, x_test, y_test, genres
 
-def load_data(data='data/test_data.csv', posters_csv="data/posters-and-genres.csv"):
+def load_data(data='data/test_data.csv', posters_csv="data/posters-and-genres.csv", img_shape=(299,299)):
     '''
     load and read data for testing or training or other tasks associated with CNNs, where the 
     data is specified by the `data` parameter. Method merges `data` with `posters_csv` and 
@@ -77,7 +77,7 @@ def load_data(data='data/test_data.csv', posters_csv="data/posters-and-genres.cs
 
     print("\nLoading images........")
     # read in all the images into an array, return number of indices used (used to combat memory error)
-    imgs, subset_size = read_images(img_ids)
+    imgs, subset_size = read_images(img_ids, dimensions=img_shape)
     print("DONE!\n")
 
     # if there was a memory error, update the labels as were updated within read_images functions
