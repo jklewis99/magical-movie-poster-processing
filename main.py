@@ -218,12 +218,13 @@ def find_threshold(model_path, model_type):
     label = np.concatenate((y_train, y_test), axis=0)
     thresholds = [0.3, 0.2, 0.1]
     plot_data = []
+    perf_data = []
 
     start = time.time()
     for threshold in thresholds:
-        genres_data, perf_data = evaluate(model, threshold, data, label, len(genres))
-        plot_data.append(genres_data)
-        perf_data.append(perf_data)
+        genres_accuracy, perfect_accuracy = evaluate(model, threshold, data, label, len(genres))
+        plot_data.append(genres_accuracy)
+        perf_data.append(perfect_accuracy)
         print(plot_data)
     end = time.time()
 
@@ -241,7 +242,7 @@ def find_threshold(model_path, model_type):
     graph.subtitle(model_name + '\n#Params: ' + model.count_params() + '\nEvaluation Completion Time: ' + str(int(end - start)) + ' seconds')
     graph.xlabel('Threshold')
     graph.ylabel('Accuracy')
-    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
+    plt.savefig(os.path.join('figures', model_name + '_perfect_evaluation.png'))
 
 def evaluate(model, threshold, data, actual_labels, num):
     '''
