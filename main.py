@@ -75,9 +75,7 @@ def get_NasNetLarge(num_output):
 
     Return
     ==========
-    model, (331,331)
-
-    NasNetLarge model with an updated last layer MLP, required input shape
+    NasNetLarge model with an updated last layer MLP
     '''
     pre_train_model = NASNetLarge(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -85,7 +83,7 @@ def get_NasNetLarge(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model, (331, 331)
+    return model
 
 def get_InceptionResnetV2(num_output):
     '''
@@ -98,9 +96,7 @@ def get_InceptionResnetV2(num_output):
 
     Return
     ==========
-    model, (299,299)
-
-    InceptionResNetV2 model with an updated last layer MLP, required input shape
+    InceptionResNetV2 model with an updated last layer MLP
     '''
     pre_train_model = InceptionResNetV2(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -108,7 +104,7 @@ def get_InceptionResnetV2(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model, (299,299)
+    return model
 
 def get_XceptionNet(num_output):
     '''
@@ -121,9 +117,7 @@ def get_XceptionNet(num_output):
 
     Return
     ==========
-    model, (299,299)
-
-    XceptionNet model with an updated last layer MLP, required input shape
+    XceptionNet model with an updated last layer MLP
     '''
     pre_train_model = Xception(include_top=False, pooling='avg')
     output = Dense(num_output, activation='sigmoid')(pre_train_model.output)
@@ -131,7 +125,7 @@ def get_XceptionNet(num_output):
     model = Model(inputs=pre_train_model.input, outputs=output)
     model.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=learning_rate, epsilon=epsilon, amsgrad=amsgrad), metrics=['accuracy'])
     print(model.summary())
-    return model, (299,299)
+    return model
 
 def plot_history(result):
     '''
@@ -175,17 +169,18 @@ def train(train_mode, model_type, model_path):
     '''
     genres = get_genres()
 
-
-    if model_type in ['1', 'NasNet']:
-        model, shape = get_NasNetLarge(len(genres))
-    elif model_type in ['2', 'InceptionResNet']:
-        model, shape = get_InceptionResnetV2(len(genres))
-    else:
-        model, shape = get_XceptionNet(len(genres))
-
     if train_mode == 2:
         model = load_model(model_path)
-    
+
+    else:
+        if model_type in ['1', 'NasNet']:
+            model = get_NasNetLarge(len(genres))
+        elif model_type in ['2', 'InceptionResNet']:
+            model = get_InceptionResnetV2(len(genres))
+        else:
+            model = get_XceptionNet(len(genres))
+    shape = get_model_shape(model_type)
+
     x_train, y_train, x_test, y_test, _ = load_train_test(img_shape=shape)  # Load data
 
     checkpoint = ModelCheckpoint(
@@ -206,7 +201,7 @@ def train(train_mode, model_type, model_path):
     # Plot history
     plot_history(result)
 
-def find_threshold(model_path):
+def find_threshold(model_path, model_type):
     '''
     This function finds the threshold for predicting
 
@@ -215,9 +210,10 @@ def find_threshold(model_path):
     `model_path`:
         absolute or relative path to the model's file
     '''
+    shape = get_model_shape(model_type)
     model = load_model(model_path)  # Load model
     model_name = str(model_path.split('\\')[-1]).split('.')[0]
-    x_train, y_train, x_test, y_test, genres = load_train_test()  # Load data
+    x_train, y_train, x_test, y_test, genres = load_train_test(shape)  # Load data
     data = np.concatenate((x_train, x_test), axis=0)
     label = np.concatenate((y_train, y_test), axis=0)
     thresholds = [0.3, 0.2, 0.1]
@@ -225,7 +221,9 @@ def find_threshold(model_path):
 
     start = time.time()
     for threshold in thresholds:
-        plot_data.append(evaluate(model, threshold, data, label, len(genres)))
+        genres_data, perf_data = evaluate(model, threshold, data, label, len(genres))
+        plot_data.append(genres_data)
+        perf_data.append(perf_data)
         print(plot_data)
     end = time.time()
 
@@ -235,8 +233,15 @@ def find_threshold(model_path):
     graph.subtitle(model_name + '\n#Params: ' + model.count_params() + '\nEvaluation Completion Time: ' + str(int(end - start)) + ' seconds')
     graph.xlabel('Threshold')
     graph.ylabel('Accuracy')
-    plt.savefig(os.path.join(os.getcwd(), 'Data', model_name + '_evaluation.png'))
-    plt.show()
+    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
+    #plt.show()
+    fig = plt.figure()
+    graph = fig.add_subplot(1, 1, 1)
+    graph.plot(thresholds, perf_data)
+    graph.subtitle(model_name + '\n#Params: ' + model.count_params() + '\nEvaluation Completion Time: ' + str(int(end - start)) + ' seconds')
+    graph.xlabel('Threshold')
+    graph.ylabel('Accuracy')
+    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
 
 def evaluate(model, threshold, data, actual_labels, num):
     '''
@@ -284,7 +289,7 @@ def evaluate(model, threshold, data, actual_labels, num):
             if result[i] < threshold and actual_label[i] == 0:
                 acc += 1
 
-    return acc / (len(actual_labels) * num)
+    return acc / (len(actual_labels) * num), perfect_accuracy
 
 def predict(img_path, genres, model_path):
     '''
@@ -416,6 +421,30 @@ def class_activation_map(img_path, genres, model_type, model_path):
         plot_index += 1
     plt.show()
 
+def get_model_shape(model):
+    '''
+    get the needed input shape based on the model
+
+    Parameters
+    ==========
+    `model`:
+        string of that specifies the model
+
+    Return
+    shape
+
+    tuple representing the input (height, width)
+    '''
+    input_shape_map = {
+        '1': (331,331),
+        'NasNet': (331,331),
+        '2': (299,299),
+        'InceptionResNet': (299,299),
+        '3': (299,299),
+        'XceptionNet': (299,299) 
+    }
+    return input_shape_map[model]
+
 def main(args):
     '''
     Main function to define what functions to run
@@ -445,7 +474,7 @@ def main(args):
             else:
                 class_activation_map(path, genres, model_type, model_path)
     elif mode == 'find_threshold':
-        find_threshold(model_path)
+        find_threshold(model_path, model_type)
 
 
 if __name__ == '__main__':
