@@ -42,6 +42,7 @@ def main():
     plt.title('Actual Revenue vs Predicted Revenue', fontsize = 16)
     plt.ylabel('Actual Revenue', fontsize = 14)
     plt.xlabel('Predicted Revenue', fontsize = 14)
+    pdb.set_trace()
     plt.annotate(f"r2 Score = {r_squared:.2f}", (np.min(preds), 0.98*np.max(ytest)), fontsize=10) # plot the value on the graph
     plt.show()
 

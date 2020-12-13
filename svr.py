@@ -39,6 +39,12 @@ def main():
     for kernel in kernels:
         preds, r_squared = test(kernel, x_train, x_test, y_train, y_test)
         results_r2.append(r_squared)
+        plt.figure()
+        plt.scatter(preds, y_test, s = 1, marker = "o", facecolor = "none", edgecolor = "blue")
+        plt.title('Actual Revenue vs Predicted Revenue (' + kernel + ")", fontsize = 16)
+        plt.ylabel('Actual Revenue', fontsize = 14)
+        plt.xlabel('Predicted Revenue', fontsize = 14)
+        plt.annotate(f"r2 Score = {r_squared:.5f}", (np.min(preds), 0.98*np.max(y_test)), fontsize=10) # plot the value on the graph
 
     kernels = np.array(kernels)
     results_r2 = np.array(results_r2)
@@ -46,6 +52,9 @@ def main():
         (kernels.reshape(len(kernels), 1), results_r2.reshape(len(results_r2), 1)),
         axis=1)
     print(table_of_results)
+
+    # Plot results
+    plt.show()
 
     
 
