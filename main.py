@@ -61,7 +61,7 @@ height = 331  # Height of the image. The value should not be changed
 width = 331  # Width of the image. The value should not be changed
 channel = 3  # Channel of the image. 1 for grayscale and 3 for RGB
 
-threshold = 0.6  # The threshold which the model classifies the poster as the specified genre. This value is obtained after training the model and run the function find_threshold()
+threshold = 0.3  # The threshold which the model classifies the poster as the specified genre. This value is obtained after training the model and run the function find_threshold()
 
 
 def get_NasNetLarge(num_output):
