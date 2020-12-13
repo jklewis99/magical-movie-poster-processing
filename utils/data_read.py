@@ -77,7 +77,7 @@ def load_data(data='data/test_data.csv', posters_csv="data/posters-and-genres.cs
 
     print("\nLoading images........")
     # read in all the images into an array, return number of indices used (used to combat memory error)
-    imgs, subset_size = read_images(img_ids, img_shape=img_shape)
+    imgs, subset_size = read_images(img_ids, dimensions=img_shape)
     print("DONE!\n")
 
     # if there was a memory error, update the labels as were updated within read_images functions
