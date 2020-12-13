@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 
+from PIL import Image
+
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.layers import Activation
@@ -20,7 +22,7 @@ from sklearn.model_selection import train_test_split
 
 from utils.read_images import read_images
 from utils.data_read import load_data
-from utils.misc import labels_to_text, show_labels_and_predictions, LabelsPerfect
+from utils.misc import labels_to_text, show_labels_and_predictions, show_poster_and_genres, get_genres, LabelsPerfect
 
 def split_data(data="data/posters-and-genres.csv", img_shape=(299, 299)):
     '''
@@ -165,6 +167,35 @@ def test(weights_file, test_data="data/test_data.csv", path="data/Images", num_s
             cv2.imwrite(f"figures/xception_preds/img_id.png")
     return predictions, actual_genres
 
+def predict(img_path, model_path='weights/xception_checkpoint-best.h5'):
+    '''
+    This function predicts a specific poster st specified `img_path`
+
+    Parameters
+    ==========
+    `img_path`:
+        absolute or relative path to poster image
+
+    `genres`:
+        all possible string genres for a film (as defined in training)
+    
+    `model_path`:
+        absolute or relative path to the model's file
+    '''
+    result = []  # This variable refers to all the genre that the poster might belong to
+    genres = get_genres()
+    model = load_model(model_path, len(genres))  # Load model
+    data = np.zeros((1, 299, 299, 3))  # Initialize data
+    data[0] = np.asarray(Image.open(img_path).resize((299, 299), Image.ANTIALIAS))  # Load data
+    prediction = model.predict(data)  # Make prediction
+
+    # Get the genre that is equal or larger than the threshold
+    for i in range(len(genres)):
+        if prediction[0][i] >= 0.2:
+            result.append(genres[i])
+    show_poster_and_genres(img_path, result)
+    print('Genre(s): ' + str(result))
+
 def load_model(weights_path, num_labels, input_shape=(299,299), num_channels=3):
     '''
     load a pretrained model
@@ -294,7 +325,7 @@ def main():
     parser = argparse.ArgumentParser(description='XceptionNet model')
     parser.add_argument(
         'mode',
-        choices=['train', 'test', 'evaluate'],
+        choices=['train', 'test', 'predict', 'evaluate'],
         help="Mode in which the model should be run"
         )
     parser.add_argument(
@@ -321,6 +352,12 @@ def main():
         default=False,
         help="if testing, boolean defining whether to save samples. Default False"
         )
+    parser.add_argument(
+        '-img_path',
+        type=str,
+        default="",
+        help="if predicting, path to the image"
+    )
     args = parser.parse_args()
 
     if args.mode == 'test':
@@ -328,6 +365,8 @@ def main():
     elif args.mode == 'train':
         train()
         # evaluate(args.by, args.weightsfolder)
+    elif args.mode == 'predict':
+        predict(args.img_path)
     else:
         pass
 

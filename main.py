@@ -215,7 +215,6 @@ def find_threshold(model_path, model_type):
     '''
     shape = get_model_shape(model_type)
     model = load_model(model_path)  # Load model
-    model_name = str(model_path.split('\\')[-1]).split('.')[0]
     x_train, y_train, x_test, y_test, genres = load_train_test(img_shape=shape)  # Load data
     data = np.concatenate((x_train, x_test), axis=0)
     label = np.concatenate((y_train, y_test), axis=0)
@@ -232,18 +231,18 @@ def find_threshold(model_path, model_type):
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, plot_data)
-    graph.set_title(model_name + " Total Genre Accuracy Per Threshold")
+    graph.set_title(model_type + " Total Genre Accuracy Per Threshold")
     graph.set_xlabel('Threshold')
     graph.set_ylabel('Accuracy')
-    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
+    plt.savefig(os.path.join('figures', model_type + '_evaluation.png'))
     #plt.show()
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, perf_data)
-    graph.set_title(model_name + " Perfect Multi-label Classification Accuracy")
+    graph.set_title(model_type + " Perfect Multi-label Classification Accuracy")
     graph.set_xlabel('Threshold')
     graph.set_ylabel('Accuracy')
-    plt.savefig(os.path.join('figures', model_name + '_perfect_evaluation.png'))
+    plt.savefig(os.path.join('figures', model_type + '_perfect_evaluation.png'))
 
 def test_data_evaluation(model_path, model_type):
     '''
@@ -259,7 +258,6 @@ def test_data_evaluation(model_path, model_type):
     '''
     shape = get_model_shape(model_type)
     model = load_model(model_path)  # Load model
-    model_name = str(model_path.split('\\')[-1]).split('.')[0] + "-TEST"
     x_test, y_test, _, genres = load_data(img_shape=shape)  # Load data
     thresholds = [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     plot_data = []
@@ -274,18 +272,18 @@ def test_data_evaluation(model_path, model_type):
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, plot_data)
-    graph.set_title(model_name + " Total Genre Accuracy Per Threshold")
+    graph.set_title(model_type + " Total Genre Accuracy Per Threshold")
     graph.set_xlabel('Threshold')
     graph.set_ylabel('Accuracy')
-    plt.savefig(os.path.join('figures', model_name + '_evaluation.png'))
+    plt.savefig(os.path.join('figures', model_type + '_evaluation.png'))
     #plt.show()
     fig = plt.figure()
     graph = fig.add_subplot(1, 1, 1)
     graph.plot(thresholds, perf_data)
-    graph.set_title(model_name + " Perfect Multi-label Classification Accuracy")
+    graph.set_title(model_type + " Perfect Multi-label Classification Accuracy")
     graph.set_xlabel('Threshold')
     graph.set_ylabel('Accuracy')
-    plt.savefig(os.path.join('figures', model_name + '_perfect_evaluation.png'))
+    plt.savefig(os.path.join('figures', model_type + '_perfect_evaluation.png'))
 
 def evaluate(model, threshold, data, actual_labels, num):
     '''
