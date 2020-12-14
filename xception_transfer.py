@@ -167,6 +167,47 @@ def test(weights_file, test_data="data/test_data.csv", path="data/Images", num_s
             cv2.imwrite(f"figures/xception_preds/img_id.png")
     return predictions, actual_genres
 
+def test_data_evaluation(model_path, model_type):
+    '''
+    This function finds the threshold for predicting genres on the test data
+
+    Parameters
+    ==========
+    `model_path`:
+        absolute or relative path to the model's file
+
+    `model_type`:
+        string type of the model
+    '''
+    model = load_model(model_path, 25)  # Load model
+    x_test, y_test, _, genres = load_data()  # Load data
+    thresholds = [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+    plot_data = []
+    perf_data = []
+
+    for threshold in thresholds:
+        genres_accuracy, perfect_accuracy = evaluate(model, threshold, x_test, y_test, len(genres))
+        plot_data.append(genres_accuracy)
+        perf_data.append(perfect_accuracy)
+        print(plot_data)
+
+    fig = plt.figure()
+    graph = fig.add_subplot(1, 1, 1)
+    graph.plot(thresholds, plot_data)
+    graph.set_title(model_type + " Total Genre Accuracy Per Threshold")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
+    plt.savefig(os.path.join('figures', model_type + '_evaluation.png'))
+    #plt.show()
+    fig = plt.figure()
+    graph = fig.add_subplot(1, 1, 1)
+    graph.plot(thresholds, perf_data)
+    graph.set_title(model_type + " Perfect Multi-label Classification Accuracy")
+    graph.set_xlabel('Threshold')
+    graph.set_ylabel('Accuracy')
+    plt.savefig(os.path.join('figures', model_type + '_perfect_evaluation.png'))
+
+
 def predict(img_path, model_path='weights/xception_checkpoint-best.h5'):
     '''
     This function predicts a specific poster st specified `img_path`
@@ -246,24 +287,72 @@ def find_threshold():
         "predictions": predictions
     }
 
-def evaluate(model, threshold, data, label, num_labels):
+def evaluate(model, threshold, data, actual_labels, num):
     '''
     This function evaluates the model performance given the threshold and other data
+
+    Parameters
+    ==========
+    `model`:
+        Keras model for evaluating
+        
+    `threshold`:
+        required confidence by model to count a prediction as a "yes" or "no"
+    
+    `data`:
+        data from which to get predictions
+
+    `actual_labels`:
+        correct labels for the data
+
+    `num_labels`:
+        number of possible labels
+
+    Return
+    ==========
+    percentage of labels accurately predicted by the model
     '''
-    print("Predicting.......", end="")
     prediction = model.predict(data)
-    print("DONE")
     acc = 0
 
-    for result, sub_label in zip(prediction, label):
-        for i in range(num_labels):
-            if result[i] >= threshold and sub_label[i] == 1:
+    # TODO: EVALUATE THIS CODE BLOCK
+    #######################################
+    binary_preds = np.zeros_like(prediction)
+    binary_preds[np.where(prediction > threshold)] = 1
+    values = np.equal(binary_preds, actual_labels) # get the element-wise equality
+    perfect_count = np.count_nonzero(np.all(values, axis=1)) # get which rows are equal for each genre
+    perfect_accuracy = perfect_count / len(binary_preds)
+    print(perfect_accuracy)
+    #######################################
+    
+    for result, actual_label in zip(prediction, actual_labels):
+        for i in range(num):
+            if result[i] >= threshold and actual_label[i] == 1:
                 acc += 1
 
-            if result[i] < threshold and sub_label[i] == 0:
+            if result[i] < threshold and actual_label[i] == 0:
                 acc += 1
 
-    return (acc / (len(label) * num_labels), prediction)
+    return acc / (len(actual_labels) * num), perfect_accuracy
+
+# def evaluate(model, threshold, data, label, num_labels):
+#     '''
+#     This function evaluates the model performance given the threshold and other data
+#     '''
+#     print("Predicting.......", end="")
+#     prediction = model.predict(data)
+#     print("DONE")
+#     acc = 0
+
+#     for result, sub_label in zip(prediction, label):
+#         for i in range(num_labels):
+#             if result[i] >= threshold and sub_label[i] == 1:
+#                 acc += 1
+
+#             if result[i] < threshold and sub_label[i] == 0:
+#                 acc += 1
+
+#     return (acc / (len(label) * num_labels), prediction)
 
 def build_model(num_labels, input_shape=(299, 299), num_channels=3):
     '''
@@ -329,31 +418,31 @@ def main():
         help="Mode in which the model should be run"
         )
     parser.add_argument(
-        '-weights',
+        '-weights', '--weights',
         type=str,
         default="weights/xception_checkpoint-best.h5",
         help="If testing, path of saved weights"
         )
     parser.add_argument(
-        '-loss',
+        '-loss', '--loss',
         type=str,
         default="binary_crossentropy",
         help="loss function to monitor. Default: binary_crossentropy"
         )
     parser.add_argument(
-        '-samples',
+        '-samples', '--samples',
         type=int,
         default="3",
         help="if testing, number of samples to show and save (if desired). Default 3."
         )
     parser.add_argument(
-        '-save',
+        '-save', '--save',
         type=bool,
         default=False,
         help="if testing, boolean defining whether to save samples. Default False"
         )
     parser.add_argument(
-        '-img_path',
+        '-img_path', '--img_path',
         type=str,
         default="",
         help="if predicting, path to the image"
@@ -361,7 +450,8 @@ def main():
     args = parser.parse_args()
 
     if args.mode == 'test':
-        test(args.weights, num_samples=args.samples, save_imgs=args.save)
+        test_data_evaluation(args.weights, 'XceptionNet')
+        # test(args.weights, num_samples=args.samples, save_imgs=args.save)
     elif args.mode == 'train':
         train()
         # evaluate(args.by, args.weightsfolder)
