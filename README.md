@@ -164,7 +164,7 @@ There are 4 types of kernels when running `box_office.py svr`. 'linear' is the D
 2. `rbf` will select rbf kernel
 2. `sigmoid` will select sigmoid kernel
 
-Use `python main.py --help` for all other parameters and options
+Use `box_office.py --help` for all other parameters and options
 
 Examples of Command:
 * To create and train a new linear regression model:
