@@ -61,7 +61,7 @@ height = 331  # Height of the image. The value should not be changed
 width = 331  # Width of the image. The value should not be changed
 channel = 3  # Channel of the image. 1 for grayscale and 3 for RGB
 
-threshold = 0.3  # The threshold which the model classifies the poster as the specified genre. This value is obtained after training the model and run the function find_threshold()
+threshold = 0.4  # The threshold which the model classifies the poster as the specified genre. This value is obtained after training the model and run the function find_threshold()
 
 
 def get_NasNetLarge(num_output):
@@ -333,9 +333,9 @@ def evaluate(model, threshold, data, actual_labels, num):
 
     return acc / (len(actual_labels) * num), perfect_accuracy
 
-def predict(img_path, genres, model_path):
+def predict(img_path, genres, model_path, actual=None):
     '''
-    This function predicts a specific poster st specified `img_path`
+    This function predicts a specific poster at specified `img_path`
 
     Parameters
     ==========
@@ -347,6 +347,11 @@ def predict(img_path, genres, model_path):
     
     `model_path`:
         absolute or relative path to the model's file
+
+    Keyword Args
+    ==========
+    `actual`:
+        ground truth labels
     '''
     result = []  # This variable refers to all the genre that the poster might belong to
     model = load_model(model_path)  # Load model
@@ -358,7 +363,7 @@ def predict(img_path, genres, model_path):
     for i in range(len(genres)):
         if prediction[0][i] >= threshold:
             result.append(genres[i])
-    show_poster_and_genres(img_path, result, save_img=True, model=model_path.split("\\")[-1][:-3])
+    show_poster_and_genres(img_path, result, text_actual=actual, save_img=True, model=model_path.split("/")[-1][:-3])
     print('Genre(s): ' + str(result))
 
 def class_activation_map(img_path, genres, model_type, model_path):
@@ -480,8 +485,8 @@ def get_model_shape(model):
     input_shape_map = {
         '1': (331,331),
         'NasNet': (331,331),
-        '2': (299,299),
-        'InceptionResNet': (299,299),
+        '2': (300,300),
+        'InceptionResNet': (300,300),
         '3': (299,299),
         'XceptionNet': (299,299) 
     }
