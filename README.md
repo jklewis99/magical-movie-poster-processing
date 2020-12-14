@@ -175,7 +175,7 @@ Examples of Command:
 * To create and train a new svr model with a sigmoid kernel:
 
     ```
-    python box_office.py linear --kernel= sigmoid
+    python box_office.py svr --kernel= sigmoid
     ```
 
 ## Navigating this Repo
