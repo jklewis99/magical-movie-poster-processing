@@ -6,6 +6,7 @@ import argparse
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import xception_transfer as xception
 
 from PIL import Image
 from tensorflow.keras.layers import Dense
@@ -170,7 +171,7 @@ def train(train_mode, model_type, model_path):
     genres = get_genres()
 
     if train_mode == 2:
-        model = load_model(model_path)
+        model = get_model(model_path, model_type)
 
     else:
         if model_type in ['1', 'NasNet']:
@@ -178,7 +179,9 @@ def train(train_mode, model_type, model_path):
         elif model_type in ['2', 'InceptionResNet']:
             model = get_InceptionResnetV2(len(genres))
         else:
-            model = get_XceptionNet(len(genres))
+            #TODO: FIX MODEL
+            # model = get_XceptionNet(len(genres))
+            model = xception.build_model(len(genres))
     shape = get_model_shape(model_type)
 
     x_train, y_train, x_test, y_test, _ = load_train_test(img_shape=shape)  # Load data
@@ -214,7 +217,7 @@ def find_threshold(model_path, model_type):
         string type of the model
     '''
     shape = get_model_shape(model_type)
-    model = load_model(model_path)  # Load model
+    model = get_model(model_path, model_type)  # Load model
     x_train, y_train, x_test, y_test, genres = load_train_test(img_shape=shape)  # Load data
     data = np.concatenate((x_train, x_test), axis=0)
     label = np.concatenate((y_train, y_test), axis=0)
@@ -244,6 +247,25 @@ def find_threshold(model_path, model_type):
     graph.set_ylabel('Accuracy')
     plt.savefig(os.path.join('figures', model_type + '_perfect_evaluation.png'))
 
+def get_model(model_path, model_type):
+    '''
+    return model as specified by model_path. XceptionNet loads
+    weights, while the other two models load models
+
+    Parameters
+    ==========
+    `model_path`:
+        absolute or relative path to the model's file
+
+    `model_type`:
+        string type of the model
+    '''
+    if model_type in ['3', 'XceptionNet']:
+        model = xception.load_model(model_path, 25)
+    else:
+        model = load_model(model_path)  # Load model
+    return model
+
 def test_data_evaluation(model_path, model_type):
     '''
     This function finds the threshold for predicting genres on the test data
@@ -257,7 +279,7 @@ def test_data_evaluation(model_path, model_type):
         string type of the model
     '''
     shape = get_model_shape(model_type)
-    model = load_model(model_path)  # Load model
+    model = get_model(model_path, model_type)  # Load model
     x_test, y_test, _, genres = load_data(img_shape=shape)  # Load data
     thresholds = [0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
     plot_data = []
@@ -333,7 +355,7 @@ def evaluate(model, threshold, data, actual_labels, num):
 
     return acc / (len(actual_labels) * num), perfect_accuracy
 
-def predict(img_path, genres, model_path, actual=None):
+def predict(img_path, genres, model_path, model_type, actual=None):
     '''
     This function predicts a specific poster at specified `img_path`
 
@@ -354,16 +376,17 @@ def predict(img_path, genres, model_path, actual=None):
         ground truth labels
     '''
     result = []  # This variable refers to all the genre that the poster might belong to
-    model = load_model(model_path)  # Load model
-    data = np.zeros((1, height, width, channel))  # Initialize data
-    data[0] = np.asarray(Image.open(img_path).resize((height, width), Image.ANTIALIAS))  # Load data
+    model = get_model(model_path, model_type) # Load model
+    shape = get_model_shape(model_type)
+    data = np.zeros((1, shape[0], shape[1], channel))  # Initialize data
+    data[0] = np.asarray(Image.open(img_path).resize(shape, Image.ANTIALIAS))  # Load data
     prediction = model.predict(data)  # Make prediction
 
     # Get the genre that is equal or larger than the threshold
     for i in range(len(genres)):
         if prediction[0][i] >= threshold:
             result.append(genres[i])
-    show_poster_and_genres(img_path, result, text_actual=actual, save_img=True, model=model_path.split("/")[-1][:-3])
+    show_poster_and_genres(img_path, result, text_actual=actual)
     print('Genre(s): ' + str(result))
 
 def class_activation_map(img_path, genres, model_type, model_path):
@@ -384,19 +407,23 @@ def class_activation_map(img_path, genres, model_type, model_path):
     `model_path`:
         absolute or relative path to model 
     '''
+    if model_type not in ['1', 'NasNet']:
+        raise NotImplementedError("\nOOPS! This function can only be called on the NasNet Model at the moment...\
+            \nPlease change the --model parameter to '1' or 'NasNet'")
     tf.compat.v1.disable_eager_execution()  # This is used to solve problems for Tensorflow v2
     result = []  # This variable stores the genre predictions
     intensity = 0.8  # This is the transparency of the heat map
 
+    shape = get_model_shape(model_type)
     # Load and process images
-    img = image.load_img(img_path, target_size=(height, width))
+    img = image.load_img(img_path, target_size=shape)
     process_img = image.img_to_array(img)
     process_img = np.expand_dims(process_img, axis=0)
 
     result_img = [img]  # This variable stores the default image the class_activation_map for each genre
 
-    # Load model and predict the result
-    model = load_model(model_path)
+    model = get_model(model_path, model_type) # Load model
+    print("HERE")
     predictions = model.predict(process_img)
 
     # Get the genre that is equal or larger than the threshold
@@ -409,14 +436,15 @@ def class_activation_map(img_path, genres, model_type, model_path):
 
             index += 1
 
-    # Get the final convolution layer fro each model.
-    # The index is determine by the following code: 
+    # Get the final convolution layer from each model.
+    # The index is determined by the following code: 
     # dictionary = {v.name: i for i, v in enumerate(model.layers)}
+    model.summary()
     final_convolution_layer = {
         '1': 1038,
         'NasNet': 1038,
-        '2': 779,
-        'InceptionResNet': 779,
+        '2': 149,
+        'InceptionResNet': 149,
         '3': 131,
         'XceptionNet': 131 
     }
@@ -517,7 +545,7 @@ def main(args):
             print('Please provide a path to the image')
         else:
             if mode == 'predict':
-                predict(path, genres, model_path)
+                predict(path, genres, model_path, model_type)
             else:
                 class_activation_map(path, genres, model_type, model_path)
     elif mode == 'find_threshold':

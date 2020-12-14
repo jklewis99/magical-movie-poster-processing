@@ -404,7 +404,7 @@ def build_model(num_labels, input_shape=(299, 299), num_channels=3):
     model_connection = xception_model(input_image_size) # connect the input to the xception model
     model_connection = top_model(model_connection) # connect xception to the fully connected layer
     model = Model(inputs=input_image_size, outputs=model_connection)
-    model.summary()
+    # model.summary()
     return model
 
 def main():

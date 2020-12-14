@@ -54,59 +54,25 @@ Alternatively, these files can be downloaded with the `gdown` executable (which 
 ```
 cd models
 gdown https://drive.google.com/uc?id=1mflm_OPy-V1wVjG_zPqdcgjG0VfYDfV6
+gdown https://drive.google.com/uc?id=1IAETAbjbFccrM56hQQYp8fL-sYQjpIJa
+gdown https://drive.google.com/uc?id=1VYamYNnLz4mkvp9x4_3gttZqYQIZl4W3
 ```
-**Note**: This is *required* for most CNN functions in `main.py` if you do not train your own models.
+**Note**: This is *required* for most CNN functions in `genre_classification.py` if you do not train your own models.
 
 #### 5. (Optional) Download external raw data
 The raw data, from Wei-Ta Chu and Hung-Jui Guo's paper **Movie Genre Classification based on Poster Images with Deep Neural Networks**, can be downloaded [here](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip). For more information and to better understand the data, we recommend going to the [source](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/index.html).
 
 **Note**: For the file, [`poster_metadata.py`](/poster_metadata.py), to run, this data must be downloaded into the [`data`](/data) folder. It should be double nested folder, `Movie_Poster_Metadata/groundtruth`, in which are `.txt` files whose name is by their year of the films data within the `.txt` file, ranging from 1970 to 2015, inclusive. For example: `2002.txt` is a valid name of the file.
 
-## Branches
-After you have cloned the repository and have set up the data, checkout to your branch (`lewis`, `kim`, `baehr`, `phan`):
-```
-git checkout [BRANCH-NAME]
-```
-Show all the branches and verify that you are on the right branch:
-```
-git branch -a
-```
-Before you begin working on any work, make sure your branch is in sync with `main`:
-```
-git checkout main
-git pull
-git checkout [BRANCH-NAME]
-git merge main
-```
-When you want to merge your branch with main:
-```
-git add . # stage all files for commit
-git commit -m "Statement describing commit"
-```
-* If this is your first push to a remote upstream for the branch:
-    ```
-    git push --set-upstream origin [BRANCH-NAME]
-    ```
-* Otherwise:
-    ```
-    git push
-    ```
-```
-git checkout main
-git merge [BRANCH-NAME]
-git commit -m "Merged branch [BRANCH-NAME] with main"
-git push
-```
-
 ## Genre Classification
-There are 4 modes when running `main.py`. `mode` is a REQUIRED parameter:
+There are 4 modes when running `genre_classification.py`. `mode` is a REQUIRED parameter:
 
 1. `train` will start loading data, creating neural network model, and training the model
 2. `predict` will predict the genres based on the image
 3. `find_threshold` will output and save the graph accuracy vs threshold under the name 'evaluation.png'
 4. `class_activation_map` will create a class activation map on the image
 
-There are 3 types of models when running `main.py`. 'NasNet' is the DEFAULT `model`:
+There are 3 types of models when running `genre_classification.py`. 'NasNet' is the DEFAULT `model`:
 1. `1` or `NasNet` will select NasNetLarge model
 2. `2` or `InceptionResNet` will select InceptionResNetV2 model
 3. `3` or `XceptionNet` will select XceptionNet model
@@ -117,38 +83,38 @@ When using `train`, there are 2 options for `train_mode` (default is 1)
 
 When using `predict` or `class_activation_map`, `--path`, representing the path of the image.
 
-Use `python main.py --help` for all other parameters and options
+Use `python genre_classification.py --help` for all other parameters and options
 
 Examples of Command:
 * To create and train a new NasNetLarge model:
 
     ```
-    python main.py train --model=1 --train_mode=1
+    python genre_classification.py train --model=1 --train_mode=1
     ```
-* To use NasNetLarge model (assuming the model has been trained) to predict the image located at `data/Images/tt2911666.jpg`:
+* To use NasNetLarge model (assuming the model has been trained) to predict the image located at `data/Images/tt1077368.jpg`:
     ```
-    python main.py predict --model=1 --path=data/Images/tt2911666.jpg
+    python genre_classification.py predict --model=1 --path=data/Images/tt2911666.jpg
     ```
-* To use NasNetLarge model (assuming the model has been trained) to create a class activation map on the image called `data/Images/tt2582802.jpg`:
+* To use NasNetLarge model (assuming the model has been trained) to create a class activation map on the image called `data/Images/tt2911666.jpg`:
     ```
-    python main.py class_activation_map --model=1 --path=data/Images/tt2582802.jpg
+    python genre_classification.py class_activation_map --model=1 --path=data/Images/tt2582802.jpg
     ```
 * To use NasNetLarge model (assuming the model has been trained) to find the threshold (confidence level):
     ```
-    python main.py find_threshold --model=1
+    python genre_classification.py find_threshold --model=1
     ```
 ### What to expect
 If you are running these functions on a computer compatible with an NVIDIA GPU with enough memory, most functions will run relatively fast. In general, these functions will run on the CPU, but will be much slower:
 
 For `train`, this is NOT recommended. *It is unreasonable to expect results within a week using only the CPU*
 
-For `predict`, this will take about ~60 seconds.
+For `predict`, this will take about ~15-60 seconds, depending on the model
 
 For `class_activation_map`, this will take approximately ~60 seconds.
 
-For `find_threshold`, this is NOT recommended. *This will take approximately more than 30+ minutes (for 1000 images).*
+For `find_threshold`, this is NOT recommended. *This will take approximately more than 30 minutes (for 1000 images).*
 
-**Note**: Data size is downsampled if there is not enough available RAM for storing the all images in the dataset.
+**Note**: Data size is downsampled if there is not enough available RAM for storing all of the images in the dataset.
 
 ## Box Office Prediction
 
@@ -167,22 +133,22 @@ There are 4 types of kernels when running `box_office.py svr`. 'linear' is the D
 Use `box_office.py --help` for all other parameters and options
 
 Examples of Command:
-* To create and train a new linear regression model:
+* To train, test, and show plots for predictions for a linear regression model:
 
     ```
     python box_office.py linear
     ```
-* To create and train a new svr model with a sigmoid kernel:
+* To train, test, and show plots for predictions for a Support Vector Regression model with a sigmoid kernel:
 
     ```
-    python box_office.py svr --kernel= sigmoid
+    python box_office.py svr --kernel=sigmoid
     ```
 
 ## Navigating this Repo
 ```bash
 ├── Genre Classification
 │   ├── README
-│   ├── main.py
+│   ├── genre_classification.py
 │   └── requirements.txt
 ├── data
 │   ├── Images
@@ -193,30 +159,7 @@ Examples of Command:
 │   ├── test_data.csv
 │   └── train_data.csv
 ├── figures
-│   ├── allCorrelations.png
-│   ├── background-img.png
-│   ├── CorrelationRevImdbRating.png
-│   ├── CorrelationRevImdbVotes.png
-│   ├── CorrelationRevMetascore.png
-│   ├── CorrelationRevReleaseMonth.png
-│   ├── CorrelationRevRuntime.png
-│   ├── distribution-by-year.png
-│   ├── distribution-of-genres.png
-│   ├── linearRegression.png
-│   ├── model-compare.png
-│   ├── month-distribution-by-category.png
-│   ├── Nasnet_evaluation.png
-│   ├── Nasnet_perfect_evaluation.png
-│   ├── NasNetLarge-predictions-tt2911666.png
-│   ├── percentage-of-genres.png
-│   ├── randomForests.png
-│   ├── svr_linear.png
-│   ├── svr_poly.png
-│   ├── svr_rbf.png
-│   ├── svr_sigmoid.png
-│   ├── xception_preds
-│   ├── xceptionnet-evaluation-bar.png
-│   └── xceptionnet-evaluation.png
+│   ├── *.png
 ├── models
 │   ├── InceptionResNetV2.h5
 │   ├── NasNetLarge.h5
@@ -236,13 +179,11 @@ Examples of Command:
 │   └── xception_checkpoint-best.h5
 ├── box_office.py
 ├── clean.py
-├── correlationsMetadata.py
 ├── correlations_train_test.py
-├── garbage.py
-├── garbage.py
+├── correlationsMetadata.py
 ├── generate_train_test.py
 ├── linearRegression.py
-├── main.py
+├── genre_classification.py
 ├── poster_metadata.py
 ├── requirements.txt
 ├── randomForests.py
@@ -254,10 +195,10 @@ Examples of Command:
 >Inside of this folder is all of the data from each step in the process. After [raw metadata](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/Movie_Poster_Metadata.zip) is processed with the [`poster_metadata.py`](/poster_metadata.py) file, the file [`movies-metadata.csv`](/data/movies-metadata.csv) is created within this folder.
 
 > ### /figures
->Inside this folder you will find figures that compare models and highlight features in the dataset. For example, you can see in [this image](/figures/background_img.png) that not all posters in the dataset came from movies.
+>Inside this folder you will find figures that compare models and highlight features in the dataset. For example, you can see in [this image](/figures/background_img.png) that not all posters in the dataset came from movies. You can also see how predictions compare to actual labels in files that are identified by `NasNet-{}.png`
 
 > ### /models
->Inside this folder you will find the `.h5` files that encode the pre-trained models for `InceptionResNetV2`, `NasNetLarge`, and `XceptionNet`. The files which is used in the `main.py` file is specified by the `model` parameter.
+>Inside this folder you will find the `.h5` files that encode the pre-trained models for `InceptionResNetV2`, `NasNetLarge`, and `XceptionNet`. The weights/model file which is used in the `genre_classification.py` file is specified by the `model` parameter.
 
 > ### /notebooks
 >Inside this folder is the [notebook](/notebooks/pandas_intro) we created to help those new to the [Pandas](https://pandas.pydata.org/) data analysis API so that they can use this data for a *brief* introduction to the powerful tool. You will also find the [`data_clean.ipynb`](/notebooks/data_clean.ipynb) notebook, which was used to clean data for regression models.
@@ -268,7 +209,7 @@ Examples of Command:
 > ### /weights
 >This folder contains the weights for the XceptionNet model with different architecture. These weights are used by [`xception_transfer.py`](/xception_transfer.py).
 
-All methods at the root of the repo were the main functions for creating this repo.
+All methods at the root of the repo were the primary functions used to create this repo.
 
 ## Acknowledgements
 * Wei-Ta Chu and Hung-Jui Guo for the [raw data](https://www.cs.ccu.edu.tw/~wtchu/projects/MoviePoster/index.html)
