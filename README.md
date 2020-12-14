@@ -150,9 +150,33 @@ For `find_threshold`, this is NOT recommended. *This will take approximately mor
 
 **Note**: Data size is downsampled if there is not enough available RAM for storing the all images in the dataset.
 
-### Box Office Prediction
+## Box Office Prediction
 
-There is 1 mode when running `box_office.py`. `mode` is a REQUIRED parameter:
+There are 3 types of models when running `box_office.py`. `model` is a REQUIRED parameter:
+
+1. `linear` will select Linear Regression model
+2. `svr` will select Support Vector Regression model
+3. `rfr` will select Random Forest Regression model
+
+There are 4 types of kernels when running `box_office.py svr`. 'linear' is the DEFAULT `kernel`:
+1. `linear` will select linear kernel
+2. `poly` will select polynomial kernel
+2. `rbf` will select rbf kernel
+2. `sigmoid` will select sigmoid kernel
+
+Use `python main.py --help` for all other parameters and options
+
+Examples of Command:
+* To create and train a new linear regression model:
+
+    ```
+    python box_office.py linear
+    ```
+* To create and train a new svr model with a sigmoid kernel:
+
+    ```
+    python box_office.py linear --kernel=rbf
+    ```
 
 ## Navigating this Repo
 ```bash
@@ -169,11 +193,27 @@ There is 1 mode when running `box_office.py`. `mode` is a REQUIRED parameter:
 │   ├── test_data.csv
 │   └── train_data.csv
 ├── figures
+│   ├── allCorrelations.png
+│   ├── background-img.png
+│   ├── CorrelationRevImdbRating.png
+│   ├── CorrelationRevImdbVotes.png
+│   ├── CorrelationRevMetascore.png
+│   ├── CorrelationRevReleaseMonth.png
+│   ├── CorrelationRevRuntime.png
 │   ├── distribution-by-year.png
 │   ├── distribution-of-genres.png
+│   ├── linearRegression.png
 │   ├── model-compare.png
 │   ├── month-distribution-by-category.png
+│   ├── Nasnet_evaluation.png
+│   ├── Nasnet_perfect_evaluation.png
+│   ├── NasNetLarge-predictions-tt2911666.png
 │   ├── percentage-of-genres.png
+│   ├── randomForests.png
+│   ├── svr_linear.png
+│   ├── svr_poly.png
+│   ├── svr_rbf.png
+│   ├── svr_sigmoid.png
 │   ├── xception_preds
 │   ├── xceptionnet-evaluation-bar.png
 │   └── xceptionnet-evaluation.png
@@ -194,12 +234,20 @@ There is 1 mode when running `box_office.py`. `mode` is a REQUIRED parameter:
 ├── weights
 │   ├── inception-resnet-v2.h5
 │   └── xception_checkpoint-best.h5
+├── box_office.py
 ├── clean.py
+├── correlationsMetadata.py
+├── correlations_train_test.py
+├── garbage.py
 ├── garbage.py
 ├── generate_train_test.py
+├── linearRegression.py
 ├── main.py
 ├── poster_metadata.py
 ├── requirements.txt
+├── randomForests.py
+├── README.md
+├── svr.py
 └── xception_transfer.py
 ```
 > ### /data
