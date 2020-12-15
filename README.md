@@ -64,6 +64,9 @@ The raw data, from Wei-Ta Chu and Hung-Jui Guo's paper **Movie Genre Classificat
 
 **Note**: For the file, [`poster_metadata.py`](/poster_metadata.py), to run, this data must be downloaded into the [`data`](/data) folder. It should be double nested folder, `Movie_Poster_Metadata/groundtruth`, in which are `.txt` files whose name is by their year of the films data within the `.txt` file, ranging from 1970 to 2015, inclusive. For example: `2002.txt` is a valid name of the file.
 
+### *MacOS Users*
+Using tensorflow on MacOS may cause some difficulties for some users. If any errors occur related to tensorflow, such as `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1045)`, you may need to install certificates. For more information, see this answer on [StackOverflow](https://stackoverflow.com/questions/46858630/python-ssl-certification-problems-in-tensorflow?rq=1) or this answer on [GitHub](https://github.com/tensorflow/models/issues/5871).
+
 ## Genre Classification
 There are 4 modes when running `genre_classification.py`. `mode` is a REQUIRED parameter:
 

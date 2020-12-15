@@ -45,6 +45,7 @@ parser.add_argument(
     '--train_mode', '-train_mode',
     choices=[1, 2],
     default=1,
+    type=int,
     help="Set the mode for training. Default train_mode is 1.\
         \n'1' for training a new model\
         \n'2' for training an existing model")
