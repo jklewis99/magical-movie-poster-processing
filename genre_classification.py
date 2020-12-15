@@ -424,7 +424,6 @@ def class_activation_map(img_path, genres, model_type, model_path):
     result_img = [img]  # This variable stores the default image the class_activation_map for each genre
 
     model = get_model(model_path, model_type) # Load model
-    print("HERE")
     predictions = model.predict(process_img)
 
     # Get the genre that is equal or larger than the threshold
@@ -440,7 +439,6 @@ def class_activation_map(img_path, genres, model_type, model_path):
     # Get the final convolution layer from each model.
     # The index is determined by the following code: 
     # dictionary = {v.name: i for i, v in enumerate(model.layers)}
-    model.summary()
     final_convolution_layer = {
         '1': 1038,
         'NasNet': 1038,
